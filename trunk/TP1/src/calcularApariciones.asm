@@ -12,7 +12,7 @@ section .text
 calcularApariciones:
                     push ebp
                     mov ebp,esp
-			  push edi
+		    push edi
                     push esi
                     push ebx
                     
@@ -27,25 +27,26 @@ calcularApariciones:
                     jmp mem_error
 mem_ok:
                     mov edi, eax	;copio el puntero a la memoria que me dio malloc en edi
-                    xor ebx, ebx
-                    mov ecx, 256
+                    xor ebx, ebx	;pongo ebx en 0 porque lo vamos a usar para inicializar el arreglo en cero
+                    mov ecx, 256	;pongo ecx en 256 porque lo vamos a usar como contador para la inicializacion
 inicializar:
-                    mov [eax], ebx
-                    lea eax, [eax + 4]
-                    loop inicializar
+                    mov [eax], ebx	; pongo cero en la i-esima posicion
+                    lea eax, [eax + 4]	; voy a la siguiente posicion
+                    loop inicializar	
                     
                     lea ebx, [esi + img_size]
-                    mov ecx, [ebx]
+                    mov ecx, [ebx]	; guardo el tamaño de la imagen en ecx
                     
-                    lea ebx [esi + img_begin]
-                    mov edx, [ebx]
+                    lea ebx, [esi + img_begin]
+                    mov edx, [ebx]	; guardo en que byte empieza la imagen en edx
                     
-                    lea esi, [esi + edx]
-                    xor ebx, ebx
-                    cld
+                    lea esi, [esi + edx]	; voy al inicio de los datos de la imagen
+                    xor ebx, ebx	;pongo ebx en 0 porque lo vamos a usar como contador de simbolos diferentes
+                    cld		;seteo en cero el bit de direccion para moverme para la derecha cuando use lods
 ciclo:
+		    xor eax, eax
                     lodsb
-                    lea edx, [edi + al]
+                    lea edx, [edi + eax]
                     mov eax, [edx]
                     cmp eax, 0
                     je agregar_simbolo
@@ -53,8 +54,9 @@ ciclo:
                     add [edx], eax
                     loop ciclo
                     
+		    mov ecx, 5
                     mov eax, ebx
-                    mul dword 5
+                    mul ecx
                     push eax
                     call malloc
                     add esp, 4
@@ -64,8 +66,8 @@ ciclo:
                     
 guardar:
                     xor cl, cl
-                    mov esi, edi; pongo la estructura auxiliar en esi
-                    mov edi, eax; pongo la estructura a devolver en edi
+                    mov esi, edi	; pongo la estructura auxiliar en esi
+                    mov edi, eax	; pongo la estructura a devolver en edi
                     mov edx, esi
                     mov eax, edi
 ciclo_2:
@@ -88,11 +90,12 @@ sigo:
                     add esp, 4
                     jmp fin
 agregar_simbolo:
-                    mov [edx], 1
+		    mov eax, 1
+                    mov [edx], eax
                     inc ebx
 
 mem_error:
-                    mov eax, -1
+                    mov eax, 0
                     jmp fin
 
 fin:
