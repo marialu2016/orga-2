@@ -1,6 +1,7 @@
 global esOc2
 
 section .text
+
 %define param_buffer [ebp + 8]
 
 esOc2:

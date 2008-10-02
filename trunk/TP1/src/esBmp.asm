@@ -1,7 +1,9 @@
 global esBmp
 
 section .text
+
 %define param_header [ebp + 8]
+
 esBmp:
 	push ebp
 	mov ebp,esp
