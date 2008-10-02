@@ -10,7 +10,7 @@ tamImg:
 	push esi
 	push edi
 
-	mov ebx,param_header; muevo headern a ebx
+	mov ebx,param_header; muevo header a ebx
 	lea ebx, [ebx + 34]; muevo desde la cabecera hasta la pos 34 que tiene tamImg
 	mov eax, [ebx]; muevo el valor contenido en la direccion de ebx a eax
 	

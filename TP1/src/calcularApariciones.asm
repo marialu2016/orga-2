@@ -16,7 +16,7 @@ calcularApariciones:
                     push esi
                     push ebx
 
-                    mov esi, buffer	;pongo en esi la direccion del buffer con los 				datos de la imagen
+                    mov esi, buffer;pongo en esi la direccion del buffer con los 					datos de la imagen
 
                     mov eax, 1024	;pongo en eax la cantidad de memoria que voy a pedir
                     push eax

@@ -1,6 +1,7 @@
 global es24
 
 section .text
+
 %define param_header [ebp + 8]
 
 es24:

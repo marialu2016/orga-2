@@ -1,6 +1,7 @@
 global insertionSort
 
 section .text
+
 %define param_tabla [ebp + 8]
 %define param_n [ebp + 12]
 
