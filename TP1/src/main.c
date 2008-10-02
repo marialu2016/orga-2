@@ -87,7 +87,7 @@ void bmp2oc2( char* bmpin, char* oc2out )
     tabla_apariciones = calcularApariciones( bufferImg );
 
     codificacion* tabla_codigos;
-    tabla_codigos = armarTablaCodigos( tabla_apariciones );
+    tabla_codigos = armarTablaCodigos( tabla_apariciones, tam );
 
     char* bufferOc2;
     bufferOc2 = codificar( tabla_codigos, bufferImg );
