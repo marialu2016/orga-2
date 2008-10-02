@@ -12,9 +12,13 @@ typedef struct {
 	int cant_apariciones;
 } apariciones;
 
-extern bool esBmp( char* bufferImg );
-extern int tamImg( char* bufferImg );
-extern bool esOc2( char*bufferImg );
+extern int esBmp( char* headerImg );
+extern int tamImg( char* headerImg );
+extern int es24 (char* headerImg );
+extern int esOc2( char*bufferImg );
+extern int aquiEmpieza(char* headerImg);
+extern int ancho(char* headerImg);
+extern void insertionSort (apariciones* tabla, int n);
 extern int tamImgOc2( char* bufferImg );
 extern apariciones* calcularApariciones( char* bufferImg );
 extern codificacion* armarTablaCodigos( apariciones* tabla );
