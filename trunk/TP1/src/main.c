@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define maxTamFile 52428800
+
 /***********************************************************************************
 **                              Estructuras principales                           **
 ************************************************************************************/
@@ -36,7 +38,7 @@ typedef struct {
 typedef struct {
 	char simbolo;
 	char longCod;
-	char cod;
+	int cod;
 } codificacion;
 
 typedef struct {
@@ -59,13 +61,13 @@ extern char* decodificar( codificacion* tabla, char* bitstream );
 **************************************************************************/
 
 int esBmp( header h );
-int tamFile( header h );
-int tamImg( infoHeader h );
+long int tamFile( header h );
+long int tamImg( infoHeader h );
 int es24 ( infoHeader h );
 int esOc2( Oc2FileHeader h );
-int aquiEmpieza( header h );
-int ancho(infoHeader h);
-int tamImgOc2( Oc2FileHeader h);
+long int aquiEmpieza( header h );
+long int ancho(infoHeader h);
+long long int tamImgOc2( Oc2FileHeader h);
 
 /**************************************************************************
 **      Funciones Principales para el Compresor-Descompresor BMP-OC2     **
@@ -184,7 +186,7 @@ char* readbmp( char* bmpin, int tambuffer )
         fread( ih, 40, 1, fp );
 
 
-        if( esBmp( h ) )
+        if( esBmp( h ) && es24(ih) && ( tamFile(ih) <= maxTamFile ) )
         {
             fread( bufferImg, tambuffer, 1, fp );
         }
@@ -266,31 +268,34 @@ int esBmp( header h )
     res = ( h.bfType == str_bm );
     return res;
 }
-int tamFile( header h )
+long int tamFile( header h )
 {
-
+    return h.bfSize;
 }
-int tamImg( infoHeader h )
+long int tamImg( infoHeader h )
 {
-
+    return h.biSizeImage;
 }
 int es24 ( infoHeader h )
 {
-
+    return ( h.biBitCount == 24 );
 }
 int esOc2( Oc2FileHeader h )
 {
-
+    int str_oc2 = 79834748;
+    int res;
+    res = ( h.fType == str_oc2 );
+    return res;
 }
-int aquiEmpieza( header h )
+long int aquiEmpieza( header h )
 {
-
+    return h.bfOffBits;
 }
-int ancho(infoHeader h)
+long int ancho(infoHeader h)
 {
-
+    return h.biWidth;
 }
-int tamImgOc2( Oc2FileHeader h)
+long long int tamImgOc2( Oc2FileHeader h)
 {
-
+    return h.bSize;
 }
