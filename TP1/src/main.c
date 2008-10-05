@@ -1,9 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/***********************************************************************************
+**                              Estructuras principales                           **
+************************************************************************************/
+
+typedef struct {
+    short int bfType;   //El string "BM"
+    long int bfSize;    //Tamaño del archivo
+    short int bfReserv1;
+    short int bfReserv2;
+    long int bfOffBits; //Offset desde el comienzo del archivo a los datos (en bytes)
+} header;
+
+typedef struct {
+    long int bfSize;    //Tamaño de este header en bytes (40)
+    long int biWidth;   //ancho en pixels
+    long int biHeight;  //alto en pixels
+    short int biPlanes; //1
+    short int biBitCount;//1, 4, 8, 16, 24
+    long int biCompression;
+    long int biSizeImage;   //tamaño de la imagen en bytes
+    long int biXPelsPerM;
+    long int biYPelsPerM;
+    long int biClrUsed;
+    long int biClrImportant;
+} infoHeader;
+
+typedef struct {
+    int fType;  //El string "OC2\0"
+    char tSize; //Tamaño en bytes de la tabla de codigos
+    long long int bSize;//tamaño en bits del bitstream
+} Oc2FileHeader;
+
 typedef struct {
 	char simbolo;
-	char longcod;
+	char longCod;
 	char cod;
 } codificacion;
 
@@ -12,18 +44,32 @@ typedef struct {
 	int cant_apariciones;
 } apariciones;
 
-extern int esBmp( char* headerImg );
-extern int tamImg( char* headerImg );
-extern int es24 (char* headerImg );
-extern int esOc2( char*bufferImg );
-extern int aquiEmpieza(char* headerImg);
-extern int ancho(char* headerImg);
+/**********************************************************************
+**                      Funciones en assembler                       **
+***********************************************************************/
+
 extern void insertionSort (apariciones* tabla, int n);
-extern int tamImgOc2( char* bufferImg );
 extern apariciones* calcularApariciones( char* bufferImg );
 extern codificacion* armarTablaCodigos( apariciones* tabla );
 extern char* codificar( codificacion* tabla, char* bufferImg );
 extern char* decodificar( codificacion* tabla, char* bitstream );
+
+/*************************************************************************
+**              Funciones para el encabezado del BMP y OC2              **
+**************************************************************************/
+
+int esBmp( header h );
+int tamFile( header h );
+int tamImg( infoHeader h );
+int es24 ( infoHeader h );
+int esOc2( Oc2FileHeader h );
+int aquiEmpieza( header h );
+int ancho(infoHeader h);
+int tamImgOc2( Oc2FileHeader h);
+
+/**************************************************************************
+**      Funciones Principales para el Compresor-Descompresor BMP-OC2     **
+***************************************************************************/
 
 void bmp2oc2( char* bmpin, char* oc2out );
 void oc22bmp( char* oc2in, char* bmpout );
@@ -31,6 +77,10 @@ char* readbmp( char* bmpin );
 void writebmp( char* bufferBmp );
 char* readoc2( char* oc2in );
 void writeoc2( char* BufferOc2 );
+
+/***************************************************************************
+**                      Implementacion de las funciones                   **
+****************************************************************************/
 
 int main()
 {
@@ -112,12 +162,15 @@ void oc22bmp( char* oc2in, char* bmpout )
     writebmp( bufferBmp, bmpout );
 }
 
-char* readbmp( char* bmpin )
+char* readbmp( char* bmpin, int tambuffer )
 {
     /*readbmp: levanta las estructuras del encabezado del archivo .bmp (header e infoHeader)
     y copia los datos de la imagen en un buffer.*/
 
     file *fp;
+    char* bufferImg;
+    header h;
+    infoHeader ih;
 
     fp = fopen( bmpin, "r" );
 
@@ -127,13 +180,13 @@ char* readbmp( char* bmpin )
     }
     else
     {
-        char* bufferImg;
-        fread( bufferImg, 6, 1, fp );
+        fread( h, 14, 1, fp );
+        fread( ih, 40, 1, fp );
 
-        if( esBmp( bufferImg ) )
+
+        if( esBmp( h ) )
         {
-            tam = tamImg( bufferImg );
-            fread( bufferImg, tamImg, 1, fp );
+            fread( bufferImg, tambuffer, 1, fp );
         }
     }
     fclose(fp);
@@ -204,4 +257,40 @@ void writeoc2( char* bufferOc2, char* oc2out )
         fwrite( BufferOc2, sizeof(BufferOc2), 1, fp );
     }
     fclose(fp);
+}
+
+int esBmp( header h )
+{
+    short int str_bm = 6677;
+    int res;
+    res = ( h.bfType == str_bm );
+    return res;
+}
+int tamFile( header h )
+{
+
+}
+int tamImg( infoHeader h )
+{
+
+}
+int es24 ( infoHeader h )
+{
+
+}
+int esOc2( Oc2FileHeader h )
+{
+
+}
+int aquiEmpieza( header h )
+{
+
+}
+int ancho(infoHeader h)
+{
+
+}
+int tamImgOc2( Oc2FileHeader h)
+{
+
 }
