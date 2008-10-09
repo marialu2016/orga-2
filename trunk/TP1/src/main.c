@@ -9,20 +9,20 @@
 
 typedef struct {
     short int bfType;   //El string "BM"
-    long int bfSize;    //Tamaño del archivo
+    long int bfSize;    //Tamaï¿½o del archivo
     short int bfReserv1;
     short int bfReserv2;
     long int bfOffBits; //Offset desde el comienzo del archivo a los datos (en bytes)
 } header;
 
 typedef struct {
-    long int bfSize;    //Tamaño de este header en bytes (40)
+    long int bfSize;    //Tamaï¿½o de este header en bytes (40)
     long int biWidth;   //ancho en pixels
     long int biHeight;  //alto en pixels
     short int biPlanes; //1
     short int biBitCount;//1, 4, 8, 16, 24
     long int biCompression;
-    long int biSizeImage;   //tamaño de la imagen en bytes
+    long int biSizeImage;   //tamaï¿½o de la imagen en bytes
     long int biXPelsPerM;
     long int biYPelsPerM;
     long int biClrUsed;
@@ -31,8 +31,8 @@ typedef struct {
 
 typedef struct {
     int fType;  //El string "OC2\0"
-    char tSize; //Tamaño en bytes de la tabla de codigos
-    long long int bSize;//tamaño en bits del bitstream
+    char tSize; //Tamaï¿½o en bytes de la tabla de codigos
+    long long int bSize;//tamaï¿½o en bits del bitstream
 } Oc2FileHeader;
 
 typedef struct {
@@ -53,7 +53,7 @@ typedef struct {
 extern void insertionSort (apariciones* tabla, int n);
 extern apariciones* calcularApariciones( char* bufferImg );
 extern codificacion* armarTablaCodigos( apariciones* tabla );
-extern char* codificar( codificacion* tabla, char* bufferImg );
+extern char* codificar( codificacion* tabla, char* bufferImg, int tamBuff );
 extern char* decodificar( codificacion* tabla, char* bitstream );
 
 /*************************************************************************
