@@ -14,51 +14,47 @@ insertionSort:
 	push edi
 	
 	mov ecx, param_n; creo un contador de la longitud del arreglo
-	mov ebx, param_tabla; empiezo con la primera posicion
-	lea ebx, [ebx + 1]; apunto con ebx al campo frecuencia
-
-ciclo:
-	cmp ecx, 1	; si hubiera un solo elemento termino. ademas cuando el contador queda en uno elarreglo ya esta ordenado
+	mov esi, param_tabla; apunta al puntero de la primera posición
+ciclo:	
+	cmp ecx, 0
 	je fin
-	mov eax, [ebx]		; uso eax para comparar [ebx] y [ebx-5]
-	lea ebx, [ebx + 5]	;voy al siguiente elemento
-	cmp [ebx], eax		;comparo el elemento a[i] con a[i-1]
-	jb preswapeo		; si es menor los intercambio
-	jmp siguiente		;sino voy al siguiente
+	dec ecx; decremento el contador de la long del arreglo
+	lea esi, [esi + 8]	; avanzo una posicion
+	mov edx, [esi - 4] ;en edx tengo el campo frecuencia del i-esimo elemento
+	mov eax, [esi + 4]; en eax tengo el campo frecuencia del i-esimo + 1 elemento
+	cmp eax, edx; comparo
+	jb preswapeo
+
+	jmp ciclo
 
 preswapeo:
-	mov edx, ebx; hago una copia del puntero actual en edx, que me servira si hago swapear
 	mov eax,param_tabla
-	jmp swapeo
-
+	mov edi, esi
 swapeo:
-	mov si, [edx - 1]	;copio el simbolo del elemento a[i]
-	mov di, [edx - 6]	;copio el simbolo del elemento a[i-1]
-	mov [edx - 1], di	;pongo en el simbolo del elemento a[i-1] al que estaba en a[i]
-	mov [edx - 6], si	;pongo en el simbolo del elemento a[i] al que estaba en a[i-1]
-
-	mov esi, [edx]		;pongo en esi la frecuencia del elemento a[i]
-	mov edi, [edx-5]	;pongo en edi la frecuencia del elemento a[i-1]
-	mov [edx], edi		;pongo en la frecuencia del elemento a[i] al que estaba en a[i-1]
-	lea edx, [edx-5]	;retrocedo un elemento
-	mov [edx], esi		;pongo en la frecuencia del elemento a[i-1] al que estaba en a[i]
+	xor ebx, ebx
+	xor edx, edx
+	mov bl,[edi - 8]; en bl esta a[i].simbolo
+	mov dl,[edi]; en dl esta a[i + 1].simbolo
 	
-
-	cmp edx, eax	; comparo los punteros, si son iguales es porque llegue al comienzo del arreglo
-	je siguiente
-
-	cmp esi, [edx-5]; comparo los dos que siguen para ver si sigo swapenado
-	jb swapeo	; si es menor swapeo los elementos
-	jmp siguiente
-
-siguiente:
-	lea ebx, [ebx + 5]	; me ubico en la siguiente posicion
-	dec ecx		; decremento el contador de la long del arreglo
-	jmp ciclo	
+	mov [edi], bl	;swapeo de caracteres
+	mov [edi - 8], dl;swapeo de caracteres
 	
+	mov ebx, [edi - 4]; en ebx esta a[i].frecuencia
+	mov edx, [edi + 4]; en edx esta a[i + 1].frecuencia
+
+	mov [edi + 4], ebx	;swapeo de enteros
+	mov [edi - 4], edx	;swapeo de enteros
+	
+	lea edi, [edi - 8]	;retrocedo una posicion
+	
+	cmp edi, eax; comparo los punteros, si son iguales es porque llegue al comienzo del arreglo
+	je ciclo
+
+	cmp edx, [edi - 4]; comparo los dos que siguen para ver si sigo swapenado
+	jb swapeo
+	jmp ciclo
 
 fin:
-	mov eax, param_tabla	; devuelvo la tabla ordenada
 	pop edi
 	pop esi
 	pop ebx
