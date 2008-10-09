@@ -1,6 +1,7 @@
-
 global codificar
+
 extern malloc
+
 section.text
 
 %define tabla [ebp+8]
@@ -14,10 +15,10 @@ section.text
 codificar:
 	push ebp
 	mov ebp, esp
+	sub esp,12
 	push edi
 	push esi
 	push ebx; convencion c
-	sub esp,12
 
 	;///////////////PEDIR MEMORIA//////////////
 	;consultar sobre cuanta memoria se debe de pedir
@@ -37,10 +38,10 @@ codificar:
 	mov esi, 32
 	
 buscar:; busca el simbolo en la tabla de codificacion
-	mov queTanLleno, esi; guardo temporalmente en queT.. el estado edi
+	mov queTanLleno, esi; guardo temporalmente en queT.. el estado de edi
 	mov esi, tabla; uso esi(ptr) para recorrer tabla de codificacion
 
-	cmp contador,0; veo si llegue al final de bstream antes de seguir
+	cmp dword contador,0; veo si llegue al final de bstream antes de seguir
 	je fin;
 	dec dword contador; sino decremento el contador de longitud bstream
 
@@ -73,14 +74,15 @@ mover_sim:; mueve bit a bit el simbolo codificado
 	je buscar;
 	dec cl; decremento el contador de long cod
 
+	cmp esi, 0; veo si me queda lugar en edi
+	je recargar
+	dec esi
+
 	shr edx, 1; muevo hacia derecha y cargo en carry el bit menos sig
 	jc agrego_1
 	jmp agrego_0
 
 agrego_1:
-	cmp esi, 0; veo si me queda lugar en edi
-	je recargar
-	dec esi
 
 	adc ecx,0; pongo un uno en el menos significativo
 	shl ecx,1; muevo uno hacia izq
@@ -88,11 +90,9 @@ agrego_1:
 	jmp mover_sim
 
 agrego_0:
-	cmp esi, 0; veo si me queda lugar en edi
-	je recargar
-	dec esi
 	
 	shl ecx,1; muevo hacia izq
+
 	jmp mover_sim
 
 recargar:;mueve a bitstream y restaura el registro
