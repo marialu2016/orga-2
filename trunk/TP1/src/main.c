@@ -51,10 +51,10 @@ typedef struct {
 ***********************************************************************/
 
 extern void insertionSort (apariciones* tabla, int n);
-extern apariciones* calcularApariciones( char* bufferImg );
+extern apariciones* calcularApariciones( char* bufferImg, int tamImg, int ancho, int trash );
 extern codificacion* armarTablaCodigos( apariciones* tabla );
-extern char* codificar( codificacion* tabla, char* bufferImg, int tamBuff );
-extern char* decodificar( codificacion* tabla, char* bitstream );
+extern char* codificar( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash );
+extern char* decodificar( codificacion* tabla, char* bitstream, long long tamBitstream, int trash );
 
 /*************************************************************************
 **              Funciones para el encabezado del BMP y OC2              **
