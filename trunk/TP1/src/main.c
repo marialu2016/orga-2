@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define maxTamFile 52428800
+#define maxTamFile 4194304
 
 /***********************************************************************************
 **                              Estructuras principales                           **
@@ -75,10 +75,10 @@ long long int tamImgOc2( Oc2FileHeader h);
 
 void bmp2oc2( char* bmpin, char* oc2out );
 void oc22bmp( char* oc2in, char* bmpout );
-char* readbmp( char* bmpin );
-void writebmp( char* bufferBmp );
-char* readoc2( char* oc2in );
-void writeoc2( char* BufferOc2 );
+char* readbmp( char* bmpin, &header h, &infoHeader ih );
+void writebmp( char* bufferBmp, &header h, &infoHeader ih  );
+char* readoc2( char* oc2in, &header h, &infoHeader ih, &Oc2FileHeader );
+void writeoc2( char* BufferOc2, &header h, &infoHeader ih, &Oc2FileHeader oh );
 
 /***************************************************************************
 **                      Implementacion de las funciones                   **
@@ -164,15 +164,13 @@ void oc22bmp( char* oc2in, char* bmpout )
     writebmp( bufferBmp, bmpout );
 }
 
-char* readbmp( char* bmpin, int tambuffer )
+char* readbmp( char* bmpin, &header h, &infoHeader ih )
 {
     /*readbmp: levanta las estructuras del encabezado del archivo .bmp (header e infoHeader)
     y copia los datos de la imagen en un buffer.*/
 
     file *fp;
     char* bufferImg;
-    header h;
-    infoHeader ih;
 
     fp = fopen( bmpin, "r" );
 
@@ -195,7 +193,7 @@ char* readbmp( char* bmpin, int tambuffer )
 
     return bufferImg;
 }
-void writebmp( char* bufferBmp, char* bmpout )
+void writebmp( char* bmpout, &header h, &infoHeader ih )
 {
     /*writebmp: escribe el header y el infoHeader y copia los datos (ya descomprimidos) de
     la imagen que estan en un buffer en el archivo .bmp.*/
@@ -213,7 +211,7 @@ void writebmp( char* bufferBmp, char* bmpout )
     }
     fclose(fp);
 }
-char* readoc2( char* oc2in )
+char* readoc2( char* oc2in, &header h, &infoHeader ih, &Oc2FileHeader )
 {
     /*readoc2: levanta las estructuras del encabezado del archivo .oc2 (header del .oc2,
     header e infoHeader del .bmp y tabla de codigos) y copia el bitstream de los datos
@@ -241,7 +239,7 @@ char* readoc2( char* oc2in )
 
     return bufferImg;
 }
-void writeoc2( char* bufferOc2, char* oc2out )
+void writeoc2( char* oc2out, &header h, &infoHeader ih, &Oc2FileHeader oh )
 {
     /*writeoc2: escribe el header del .oc2, el header e infoHeader del .bmp y la tabla de
     codigos, y copia el bitstream de los datos comprimidos que esta en un buffer en el
