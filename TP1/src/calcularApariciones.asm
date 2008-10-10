@@ -7,6 +7,8 @@ section .text
 
 %define buffer [ebp+8]
 %define img_size [ebp + 12]
+%define ancho [ebp + 16]
+%define basura [ebp + 20]
 
 calcularApariciones:
                     push ebp
@@ -36,7 +38,11 @@ inicializar:
 
                     xor ebx, ebx	;pongo ebx en 0 porque lo vamos a usar como contador de simbolos diferentes
                     cld		;seteo en cero el bit de direccion para moverme para la derecha cuando use lods
-ciclo:
+cicloext:
+		    cmp dword img_size, 0
+		    je estr_devolver
+		    mov ecx, ancho
+cicloint: 
 		    xor eax, eax	;pongo eax en cero porque lods va a guardar datos aca
                     lodsb		;leo un byte
                     lea edx, [edi + 4*eax]	;direcciono a la estructura auxiliar
@@ -44,9 +50,16 @@ ciclo:
                     je agregar_simbolo	;si es cero agrego el simbolo con una aparicion
                     add dword [edx], 1	;sino le sumo una aparicion mas
 siguiente:
-                    loop ciclo		;repito este ciclo hasta llegar al final de la imagen
+		    loop cicloint
 
-		    mov ecx, 5		;pongo en ecx un 5 porque mi estructura tiene lugares de 5 bytes
+		    mov ecx, ancho
+		    sub img_size, ecx
+		    mov ecx, basura
+		    sub img_size, ecx
+		    lea esi, [esi + ecx]
+                    jmp cicloext		;repito este ciclo hasta llegar al final de la imagen
+estr_devolver:
+		    mov ecx, 8		;pongo en ecx un 8 porque mi estructura tiene lugares de 8 bytes
                     mov eax, ebx	;pongo en eax la cantidad de elementos
                     mul ecx		;multiplico ecx por 5,que es la cantidad de memoria a pedir
                     push eax
@@ -59,29 +72,26 @@ guardar:
                     xor ecx, ecx		;seteo en cero cl, que lo usaremos para copiar el simbolo
                     mov esi, edi	; pongo la estructura auxiliar en esi
                     mov edi, eax	; pongo la estructura a devolver en edi
-                    mov edx, esi	;pongo en edx el puntero a la estructura auxiliar para 				poder moverme por la estructura
-                    mov eax, edi	;pongo en eax el puntero a la estructura a devolver para 			poder moverme por la estructura
+                    mov edx, esi	;pongo en eax el puntero a la estructura a devolver para 			poder moverme por la estructurapoder moverme por la estructura	
 ciclo_2:
                     mov ebx, [edx]	;pongo en ebx la cantidad de elementos del simbolo
                     cmp ebx, 0		;la comparo co cero
                     je sigo		; si es cero entonces sigo
 
-                    mov [eax], cl	;sino copio el simbolo
-                    lea eax, [eax + 1]
-                    mov [eax], ebx	; y la cantidad de apariciones
-                    lea eax, [eax + 4]
+                    mov [edi], cl	;sino copio el simbolo
+                    lea edi, [edi + 4]
+                    mov [edi], ebx	; y la cantidad de apariciones
+                    lea edi, [edi + 4]
 sigo:
                     lea edx, [edx + 4]	;voy a la proxima posicion de la estructura auxiliar
                     inc ecx		;incremento cl, que es el siguiente caracter
                     cmp ecx, 255		;me fijo si ya llegue al final de la estructura
                     jbe ciclo_2		; en caso de que no, sigo con el ciclo
-
-                    mov eax, edi	;en caso que si, pongo en eax, el puntero a la estructura a devolver
-
-                    mov edi, esi	; pongo en edi el puntero a la estructura auxiliar
-                    push edi		; la pusheo para liberar la memoria
+		    mov ebx, eax; salvo eax por que voy a usar free
+                    push esi		; la pusheo para liberar la memoria
                     call free		;libero la memoria
                     add esp, 4		;balanceo la pila
+		    mov eax, ebx
                     jmp fin
 agregar_simbolo:
                     mov dword [edx], 1 ;le sumo una aparicion mas
@@ -91,10 +101,10 @@ mem_error:
                     mov eax, 0
                     jmp fin
 mem_error2:
-		    mov eax, 0
                     push edi		;pusheo la estructura auxiliar para liberar la memoria
                     call free		;libero la memoria
                     add esp, 4		;balanceo la pila
+		    mov eax, 0
 
 fin:
                     pop ebx
