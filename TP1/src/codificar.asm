@@ -9,6 +9,8 @@ section .text
 %define tamBuff [ebp+16]
 %define ancho [ebp+20]
 %define trash [ebp+24]
+%define tamBitsAlta [ebp + 28]
+%define tamBitsBaja [ebp + 30]
 
 %define contadorBuff [ebp-4]
 %define queTanLleno [ebp-8]
@@ -95,6 +97,8 @@ add_long:;
 
 
 inic_reservar:
+    mov tamBitsBaja, eax
+    mov tamBitsAlta, edx ; guardo el numero de bits en el parametro pasado por referencia
 	xor ecx, ecx
 	mov ecx, 8
 	div dword ecx; calculo el resto

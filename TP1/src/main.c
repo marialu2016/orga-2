@@ -51,9 +51,9 @@ typedef struct {
 ***********************************************************************/
 
 extern void insertionSort (apariciones* tabla, int n);
-extern apariciones* calcularApariciones( char* bufferImg, int tamImg, int ancho, int trash );
-extern codificacion* armarTablaCodigos( apariciones* tabla );
-extern char* codificar( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash );
+extern apariciones* calcularApariciones( char* bufferImg, int tamImg, int ancho, int trash, &int tam );
+extern codificacion* armarTablaCodigos( apariciones* tabla, int tam );
+extern char* codificar( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash, &long long int tamBitstream );
 extern char* decodificar( codificacion* tabla, char* bitstream, long long tamBitstream, int trash );
 
 /*************************************************************************
@@ -76,9 +76,9 @@ long long int tamImgOc2( Oc2FileHeader h);
 void bmp2oc2( char* bmpin, char* oc2out );
 void oc22bmp( char* oc2in, char* bmpout );
 char* readbmp( char* bmpin, &header h, &infoHeader ih );
-void writebmp( char* bufferBmp, &header h, &infoHeader ih  );
+void writebmp( char* bufferBmp, header h, infoHeader ih  );
 char* readoc2( char* oc2in, &header h, &infoHeader ih, &Oc2FileHeader );
-void writeoc2( char* BufferOc2, &header h, &infoHeader ih, &Oc2FileHeader oh );
+void writeoc2( char* BufferOc2, header h, infoHeader ih, Oc2FileHeader oh, codificacion* tabla, char* bitstream );
 
 /***************************************************************************
 **                      Implementacion de las funciones                   **
@@ -87,7 +87,10 @@ void writeoc2( char* BufferOc2, &header h, &infoHeader ih, &Oc2FileHeader oh );
 int main()
 {
     int opcion = 0;
-
+    char* bmpin;
+    char* oc2out;
+    char* oc2in;
+    char* bmpout;
     printf( "Compresor-Descompresor de archivos Bmp-Oc2 \n\n" );
     printf( "1) Comprimir archivo Bmp. \n" );
     printf( "2) Descomprimir archivo Oc2. \n" );
@@ -132,36 +135,53 @@ int main()
 void bmp2oc2( char* bmpin, char* oc2out )
 {
     /*bmp2oc2: programa principal para comprimir.*/
+    header h;
+    infoHeader ih;
+    Oc2FileHeader oh;
+
+    int tam = 0; //cantidad de simbolos distintos
+
+    long long int tamBitstream = 0; //tamaño del bitstream
+
+    oh.fType = 79834748;
+
     char* bufferImg;
-    bufferImg = readbmp(bmpin);
+    bufferImg = readbmp( bmpin, h, ih );
+
+    trash = (ih.biWidth) % 4;
 
     apariciones* tabla_apariciones;
-    tabla_apariciones = calcularApariciones( bufferImg );
+    tabla_apariciones = calcularApariciones( bufferImg, ih.biSizeImage, ih.biWidth, trash, tam);
 
     codificacion* tabla_codigos;
-    tabla_codigos = armarTablaCodigos( tabla_apariciones, tam );
+    tabla_codigos = armarTablaCodigos( tabla_apariciones, tam);
+
+    oh.tSize = 8 * tam; //el tamaño de la tabla de codigos en bytes es la cantidad de simbolos distintos por 8 bytes que es lo que ocupa cada campo.
 
     char* bufferOc2;
-    bufferOc2 = codificar( tabla_codigos, bufferImg );
+    bufferOc2 = codificar( tabla_codigos, bufferImg, h.biSizeImage, ih.biWidth, trash, tamBitstream );
 
-    writeoc2( bufferOc2, oc2out );
+    oh.bSize = tamBitstream;
+
+    writeoc2( oc2out, h, ih, oh, tabla_codigos, bufferOc2 );
 
 }
 
 void oc22bmp( char* oc2in, char* bmpout )
 {
     /*oc22bmp: programa principal para descomprimir.*/
-    char* bufferOc2;
-    bufferOc2 = readoc2( oc2in );
-
     char* bitstream;
-
+    char* bufferBmp;
+    header h;
+    infoHeader ih;
+    Oc2FileHeader oh;
     codificacion* tabla_codigos;
 
-    char* bufferBmp;
-    bufferBmp = decodificar( tabla_codigos, bitstream )
+    bitstream = readoc2( oc2in, h, ih, oh, tabla_codigos );
 
-    writebmp( bufferBmp, bmpout );
+    bufferBmp = decodificar( tabla_codigos, bitstream, oh.bSize, trash );
+
+    writebmp( bmpout, h, ih, bufferBmp );
 }
 
 char* readbmp( char* bmpin, &header h, &infoHeader ih )
@@ -184,16 +204,16 @@ char* readbmp( char* bmpin, &header h, &infoHeader ih )
         fread( ih, 40, 1, fp );
 
 
-        if( esBmp( h ) && es24(ih) && ( tamFile(ih) <= maxTamFile ) )
+        if( esBmp( h ) && es24( ih ) && ( tamFile( ih ) <= maxTamFile ) )
         {
-            fread( bufferImg, tambuffer, 1, fp );
+            fread( bufferImg, ih.biSizeImage, 1, fp );
         }
     }
     fclose(fp);
 
     return bufferImg;
 }
-void writebmp( char* bmpout, &header h, &infoHeader ih )
+void writebmp( char* bmpout, header h, infoHeader ih )
 {
     /*writebmp: escribe el header y el infoHeader y copia los datos (ya descomprimidos) de
     la imagen que estan en un buffer en el archivo .bmp.*/
@@ -207,11 +227,13 @@ void writebmp( char* bmpout, &header h, &infoHeader ih )
     }
     else
     {
-        fwrite( bufferBmp, sizeof(bufferBmp), 1, fp );
+        fwrite( h, 14, 1, fp );
+        fwrite( ih, 40, 1, fp );
+        fwrite( bufferBmp, tamImg( ih ), 1, fp );
     }
     fclose(fp);
 }
-char* readoc2( char* oc2in, &header h, &infoHeader ih, &Oc2FileHeader )
+char* readoc2( char* oc2in, &header h, &infoHeader ih, &Oc2FileHeader oh, &codificacion* tabla )
 {
     /*readoc2: levanta las estructuras del encabezado del archivo .oc2 (header del .oc2,
     header e infoHeader del .bmp y tabla de codigos) y copia el bitstream de los datos
@@ -227,11 +249,15 @@ char* readoc2( char* oc2in, &header h, &infoHeader ih, &Oc2FileHeader )
     else
     {
         char* bufferImg;
-        fread( bufferImg, 13, 1, fp );
 
-        if( esOc2( bufferImg ) )
+        fread( oh, 13, 1, fp );
+
+        if( esOc2( oh ) )
         {
-            tam = tamImgOc2( bufferImg );
+            fread( h, 14, 1, fp );
+            fread( ih, 40, 1, fp );
+            fread(tabla, oh.tSize, 1, fp);
+            int tamImg = ( tamImgOc2( oh ) / 8 );//divido el tamaño del bitstream por 8 para tenerlo en bytes.
             fread( bufferImg, tamImg, 1, fp );
         }
     }
@@ -239,7 +265,7 @@ char* readoc2( char* oc2in, &header h, &infoHeader ih, &Oc2FileHeader )
 
     return bufferImg;
 }
-void writeoc2( char* oc2out, &header h, &infoHeader ih, &Oc2FileHeader oh )
+void writeoc2( char* oc2out, header h, infoHeader ih, Oc2FileHeader oh, codificacion* tabla, char* bitstream )
 {
     /*writeoc2: escribe el header del .oc2, el header e infoHeader del .bmp y la tabla de
     codigos, y copia el bitstream de los datos comprimidos que esta en un buffer en el
@@ -254,10 +280,19 @@ void writeoc2( char* oc2out, &header h, &infoHeader ih, &Oc2FileHeader oh )
     }
     else
     {
-        fwrite( BufferOc2, sizeof(BufferOc2), 1, fp );
+        fwrite( h, 14, 1, fp );
+        fwrite( ih, 40, 1, fp );
+        fwrite( oh, 16, 1, fp );
+        fwrite( tabla, oh.tSize, 1, fp );
+        int tamBitstream = ( ( oh.bSize ) / 8 );// paso la cantidad de bits a bytes ya que va a ser multiplo de 8
+        fwrite( bitstream, tamBitstream, 1, fp );
     }
     fclose(fp);
 }
+
+/************************************************************************************
+**                      Funciones de lectura de encabezados                        **
+*************************************************************************************/
 
 int esBmp( header h )
 {

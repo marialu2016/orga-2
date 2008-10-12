@@ -9,11 +9,12 @@ section .text
 %define img_size [ebp + 12]
 %define ancho [ebp + 16]
 %define basura [ebp + 20]
+%define tam_tabla [ebp + 24]
 
 calcularApariciones:
                     push ebp
                     mov ebp,esp
-		    push edi
+                    push edi
                     push esi
                     push ebx
 
@@ -32,7 +33,7 @@ mem_ok:
 inicializar:
                     mov dword [eax], 0	; pongo cero en la i-esima posicion
                     lea eax, [eax + 4]	; voy a la siguiente posicion
-                    loop inicializar	;repito este paso hasta llegar al final de la estructura 
+                    loop inicializar	;repito este paso hasta llegar al final de la estructura
 
                     mov ecx, img_size	; guardo el tamaño de la imagen en ecx
 
@@ -42,7 +43,7 @@ cicloext:
 		    cmp dword img_size, 0
 		    je estr_devolver
 		    mov ecx, ancho
-cicloint: 
+cicloint:
 		    xor eax, eax	;pongo eax en cero porque lods va a guardar datos aca
                     lodsb		;leo un byte
                     lea edx, [edi + 4*eax]	;direcciono a la estructura auxiliar
@@ -61,6 +62,7 @@ siguiente:
 estr_devolver:
 		    mov ecx, 8		;pongo en ecx un 8 porque mi estructura tiene lugares de 8 bytes
                     mov eax, ebx	;pongo en eax la cantidad de elementos
+                    mov tam_tabla, ebx ; pongo en el parametro tam_tabla la cantidad de simbolos distintos ya que este sera pasado por referencia
                     mul ecx		;multiplico ecx por 5,que es la cantidad de memoria a pedir
                     push eax
                     call malloc
@@ -72,7 +74,7 @@ guardar:
                     xor ecx, ecx		;seteo en cero cl, que lo usaremos para copiar el simbolo
                     mov esi, edi	; pongo la estructura auxiliar en esi
                     mov edi, eax	; pongo la estructura a devolver en edi
-                    mov edx, esi	;pongo en eax el puntero a la estructura a devolver para 			poder moverme por la estructurapoder moverme por la estructura	
+                    mov edx, esi	;pongo en eax el puntero a la estructura a devolver para 			poder moverme por la estructurapoder moverme por la estructura
 ciclo_2:
                     mov ebx, [edx]	;pongo en ebx la cantidad de elementos del simbolo
                     cmp ebx, 0		;la comparo co cero
