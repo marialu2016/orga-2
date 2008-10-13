@@ -36,11 +36,11 @@ _codificar:
 
 	mov ecx, tamBuff; copio ecx para dar el tamaño de buffer
 	mov contadorBuff, ecx; inicializo contador de long buffer
-			;contadorBuff = tamBuff
+	;contadorBuff = tamBuff
 
 	mov edx,ancho
-	mov dword bytesUtil,edx; bytesUtil = ancho
-				; servirá para recorrer las lineas
+	mov dword bytesUtil,edx
+	; bytesUtil = ancho, servirá para recorrer las lineas
 
 	mov esi, buffer; uso esi(ptr) para recorrer buffer
 	xor ebx, ebx;
@@ -58,7 +58,7 @@ escaneo_long:;
 	je prox_linea
 	dec dword bytesUtil; decremento por el avance que hare en la linea
 
-;sino es fin de linea
+;si no es fin de linea
 	mov edi, tabla; uso edi(ptr) para recorrer tabla de codificacion
 
 	mov bl, [esi]; en bl tengo el simbolo que quiero su longitud
@@ -188,7 +188,9 @@ guardar_cod:; guardo la codificacion
 	xor edx, edx
 	mov edx, [esi + tabla_cod]; guardo en edx la codificacion del simb evaluado
 	mov cl, [esi + tabla_longcod]; guardo en cl la longitud de lo codificado
-
+	
+	ror edx, ecx;muevo a los bits mas significativos
+	clc
 	mov esi, queTanLleno; esi indica el estado del reg que pasa a mem
 
 ;ESTADO: edx: tengo la codificacion,
@@ -206,7 +208,7 @@ mover_sim:; mueve bit a bit el simbolo codificado
 	je recargar
 	dec esi
 
-	shr edx, 1; muevo hacia derecha y cargo en carry el bit menos sig
+	shl edx, 1; muevo hacia derecha y cargo en carry el bit menos sig
 	jc agrego_1
 	jmp agrego_0
 
