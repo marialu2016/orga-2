@@ -51,9 +51,10 @@ typedef struct {
 ***********************************************************************/
 
 extern void insertionSort (apariciones* tabla, int n);
-extern apariciones* calcularApariciones( char* bufferImg, int tamImg, int ancho, int trash, &int tam );
+extern apariciones* calcularApariciones( char* bufferImg, int tamImg, int ancho, int trash);
 extern codificacion* armarTablaCodigos( apariciones* tabla, int tam );
-extern char* codificar( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash, &long long int tamBitstream );
+extern char* cantBytesBstream( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash );
+extern int codificar( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash, char* bitstream);
 extern char* decodificar( codificacion* tabla, char* bitstream, long long tamBitstream, int trash );
 
 /*************************************************************************
@@ -98,7 +99,7 @@ int main()
 
     while( opcion != 3 )
     {
-        printf( "Ingrese una opcion: \n" );
+        printf( "Ingrese una opcion: \nbBstream" );
         opcion = getc( stdin );
 
         switch( opcion )
@@ -139,9 +140,7 @@ void bmp2oc2( char* bmpin, char* oc2out )
     infoHeader ih;
     Oc2FileHeader oh;
 
-    int tam = 0; //cantidad de simbolos distintos
-
-    long long int tamBitstream = 0; //tamaño del bitstream
+    int bBstream;
 
     oh.fType = 79834748;
 
@@ -151,7 +150,7 @@ void bmp2oc2( char* bmpin, char* oc2out )
     trash = (ih.biWidth) % 4;
 
     apariciones* tabla_apariciones;
-    tabla_apariciones = calcularApariciones( bufferImg, ih.biSizeImage, ih.biWidth, trash, tam);
+    tabla_apariciones = calcularApariciones( bufferImg, ih.biSizeImage, ih.biWidth, trash);
 
     codificacion* tabla_codigos;
     tabla_codigos = armarTablaCodigos( tabla_apariciones, tam);
@@ -159,7 +158,10 @@ void bmp2oc2( char* bmpin, char* oc2out )
     oh.tSize = 8 * tam; //el tamaño de la tabla de codigos en bytes es la cantidad de simbolos distintos por 8 bytes que es lo que ocupa cada campo.
 
     char* bufferOc2;
-    bufferOc2 = codificar( tabla_codigos, bufferImg, h.biSizeImage, ih.biWidth, trash, tamBitstream );
+
+    
+
+    bufferOc2 = codificar( tabla_codigos, bufferImg, h.biSizeImage, ih.biWidth, trash, bBstream);
 
     oh.bSize = tamBitstream;
 

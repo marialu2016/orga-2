@@ -9,8 +9,7 @@ section .text
 %define tamBuff [ebp + 16]
 %define ancho [ebp + 20]
 %define trash [ebp + 24]
-%define tamBitsAlta [ebp + 28]
-%define tamBitsBaja [ebp + 30]
+%define memoria [ebp + 28]
 
 %define contadorBuff [ebp - 4]
 %define queTanLleno [ebp - 8]
@@ -31,93 +30,6 @@ codificar:
 	push edi
 	push esi
 	push ebx	; convencion c
-
-;***************************************************************************
-;**							Calcular memoria a pedir					  **
-;***************************************************************************
-
-	mov ecx, tamBuff 	; copio ecx para dar el tamaño de buffer
-	mov contadorBuff, ecx 	; inicializo contador de long buffer
-	;contadorBuff = tamBuff
-
-	mov edx,ancho
-	mov dword bytesUtil,edx
-	; bytesUtil = ancho, servirá para recorrer las lineas
-
-	mov esi, buffer	; uso esi(ptr) para recorrer buffer
-	xor ebx, ebx
-	xor eax, eax
-	xor ecx, ecx
-	xor edx, edx
-	xor edi, edi
-
-escaneo_long:
-	cmp dword contadorBuff,0	; veo si llegue al final de buffer antes de seguir
-	je inic_reservar;
-	dec dword contadorBuff	; sino decremento el contador de longitud buffer
-
-	cmp dword bytesUtil, 0	; veo si llegue al final de linea
-	je prox_linea
-	dec dword bytesUtil	; decremento por el avance que hare en la linea
-
-;si no es fin de linea
-	mov edi, tabla	; uso edi(ptr) para recorrer tabla de codificacion
-
-	mov bl, [esi]	; en bl tengo el simbolo que quiero su longitud
-
-	lea esi,[esi + 1]	; me posiciono al siguiente simbolo
-	jmp busq_de_long
-
-prox_linea:;
-
-	mov ecx, ancho
-	mov dword bytesUtil, ecx	; bytesUtil = ancho
-
-	mov ecx, trash
-
-
-	mov edi, tabla	; uso edi(ptr) para recorrer tabla de codificacion
-
-	lea esi, [esi + ecx]	; me posicion al siguiente simbolo
-	mov bl, [esi]	; en bl tengo el simbolo que quiero su codificacion
-
-busq_de_long:;
-	cmp bl,[edi + tabla_simb]	; comparo con el primero en edi
-	je add_long
-
-	lea edi, [edi + tabla_sig]	; me muevo al sig simb en la tabla de cod
-	jmp busq_de_long
-
-add_long:;
-	clc
-	mov bl, [edi + tabla_longcod]
-	add eax, ebx	; guardo en eax la long de la codificacion del simb evaluado
-	adc edx, 0
-	xor ebx, ebx
-	;clc
-	jmp escaneo_long
-
-;***************************************************************************
-;**								Pedir memoria					  		  **
-;***************************************************************************
-	
-inic_reservar:
-    mov tamBitsBaja, eax
-    mov tamBitsAlta, edx ; guardo el numero de bits en el parametro pasado por referencia
-	xor ecx, ecx
-	mov ecx, 8
-	div dword ecx	; calculo el resto
-	cmp edx, 0
-	je reservar
-
-	inc eax
-
-reservar:
-	push eax
-	call malloc
-	add esp, 4
-	cmp eax, 0
-	je mem_error
 	
 ;***************************************************************************
 ;**								Crear bitstream					  		  **
@@ -126,8 +38,7 @@ reservar:
 
 ;ESTADO: eax:contiene la direccion de la memoria pedida
 ;	 el resto de los registros son libre de usar
-
-	mov solucion, eax	; guardo la dir en solucion
+	mov eax, memoria
 
 	mov ecx, tamBuff	; copio ecx para dar el tamaño de buffer
 	mov contadorBuff, ecx	; inicializo contador de long buffer
@@ -136,12 +47,12 @@ reservar:
 	mov dword bytesUtil,edx	; bytesUtil = ancho
 				; servirá para recorrer las lineas
 
-	mov ebx, buffer	; uso ebx(ptr) para recorrer buffer
+	mov edi, buffer	; uso ebx(ptr) para recorrer buffer
 
 	xor edx, edx
-	xor edi, edi	; edi sera para imprimir en bstream
+	xor ebx, ebx	; edi sera para imprimir en bstream
 
-	mov esi, 32	; cargo inicialmente que tan lleno esta edi
+	mov esi, 8	; cargo inicialmente que tan lleno esta edi
 
 	
 ;***************************************************************************
@@ -163,8 +74,8 @@ buscar:	; cargo el caracter para el cual le busco su codificacion
 	mov esi, tabla	; uso esi(ptr) para recorrer tabla de codificacion
 ;esi podria ser usado luego para recorrer la tabla de codificacion o tambien eventualmente como registro auxiliar para actualizar el contador bytesUtil
 
-	mov dl, [ebx]; en dl tengo el simbolo que quiero su codificacion
-	lea ebx,[ebx + 1]; me posicion al siguiente simbolo
+	mov dl, [edi]; en dl tengo el simbolo que quiero su codificacion
+	lea edi,[edi + 1]; me posicion al siguiente simbolo
 	jmp busq_lineal
 
 saltar_linea:;como dice la etiqueta...
@@ -173,13 +84,17 @@ saltar_linea:;como dice la etiqueta...
 	mov esi,ancho
 
 	mov dword bytesUtil,esi	; bytesUtil = ancho
+	;dec dword bytesUtil
 
 	mov esi, trash
 	
-	lea ebx,[ebx + esi]	; me posicion al siguiente simbolo
-	mov esi, tabla	; uso esi(ptr) para recorrer tabla de codificacion
-	mov dl, [ebx]	; en dl tengo el simbolo que quiero su codificacion
-
+	lea edi,[edi + esi]	; me posicion al siguiente simbolo
+	;mov esi, tabla	; uso esi(ptr) para recorrer tabla de codificacion
+	;mov dl, [ebx]	; en dl tengo el simbolo que quiero su codificacion
+	sub contadorBuff,esi
+	inc dword contadorBuff
+	;lea ebx, [ebx+1]
+	jmp buscar
 
 busq_lineal:	;realiza busq lineal para devolver la codificacion
 	cmp dl,[esi + tabla_simb]	; comparo con el primero en esi
@@ -187,12 +102,16 @@ busq_lineal:	;realiza busq lineal para devolver la codificacion
 
 	lea esi, [esi + tabla_sig]	; me muevo al sig simb en la tabla de cod
 	jmp busq_lineal
-	
-mem_error:
-	mov eax, 0
-	jmp fin
-termine:
-	mov eax, solucion	; muevo a eax el ptr solucion
+
+termine:	
+	inc esi
+	xor ecx, ecx
+	mov ecx, esi
+	rol bl, cl
+
+	mov [eax], bl	; transfiero a bstream
+
+	mov eax, esi	; muevo a eax el ptr solucion
 	jmp fin
 
 guardar_cod:; guardo la codificacion
@@ -201,7 +120,7 @@ guardar_cod:; guardo la codificacion
 	mov edx, [esi + tabla_cod]; guardo en edx la codificacion del simb evaluado
 	mov cl, [esi + tabla_longcod]; guardo en cl la longitud de lo codificado
 
-	ror edx, ecx	;muevo a los bits mas significativos
+	ror edx, cl	;muevo a los bits mas significativos
 	clc
 	mov esi, queTanLleno	; esi indica el estado del reg que pasa a mem
 
@@ -222,31 +141,30 @@ mover_sim:	; mueve bit a bit el simbolo codificado
 	cmp esi, 0; veo si me queda lugar en edi
 	je recargar
 	dec esi
-
+seguir:
 	shl edx, 1; muevo hacia derecha y cargo en carry el bit menos sig
 	jc agrego_1
 	jmp agrego_0
 
 agrego_1:
 
-    shl edi, 1	; muevo uno hacia izq
-	adc edi, 0	; pongo un uno en el menos significativo
+    	shl bl, 1	; muevo uno hacia izq
+	add bl, 1	; pongo un uno en el menos significativo
 
 	jmp mover_sim
 
 agrego_0:
 
-	shl edi, 1; muevo hacia izq
+	shl bl, 1; muevo hacia izq
 
 	jmp mover_sim
 
 recargar:;mueve a bitstream y restaura el registro
-	;ror edi, 31; como está al reves, lo invierto
-	mov [eax], edi	; transfiero a bstream
-	lea eax, [eax + 4]	; avanzo el ptr eax a los prox 32 bits
-	xor edi, edi	; limpio edi para la proxima carga a edi
-	mov esi, 32	; cargo el contador que verifica si se llenó
-	jmp mover_sim
+	mov [eax], bl	; transfiero a bstream
+	lea eax, [eax + 1]	; avanzo el ptr eax a los prox 32 bits
+	xor ebx, ebx	; limpio edi para la proxima carga a edi
+	mov esi, 7	; cargo el contador que verifica si se llenó
+	jmp seguir
 	
 fin:
 	pop ebx
