@@ -2,25 +2,50 @@ global armarTablaCodigos
 
 extern malloc
 extern free
+extern insertionSort
 
 section .text
 
 %define t_apariciones [ebp + 8]
 %define tam [ebp + 12]
+
+%define apar_simb 0
+%define apar_frec 4
+%define apar_sig 8
+
 %define ptr_hojas [ebp - 4]
 %define ptr_nodos [ebp - 8]
+%define ptr_agregar [ebp - 12]
+%define tabla [ebp - 16]
+%define cuantosFaltan [ebp - 20]
+%define cantBits [ebp - 24]
+
+%define hoja_simb 0
+%define hoja_frec 1
+%define hoja_padre 5
+%define hoja_sig 9
+
+%define nodo_izq 0
+%define nodo_der 4
+%define nodo_frec 8
+%define nodo_padre 12
+%define nodo_sig 16
+
+%define tabla_simb 0
+%define tabla_longcod 1
+%define tabla_cod 4
+%define tabla_sig 8
 
 armarTablaCodigos:
                   push ebp
                   mov ebp, esp
-		  sub esp, 8
+		  sub esp, 24
                   push edi
                   push esi
                   push ebx 
 
-                  mov esi, t_apariciones;pongo en esi el puntero a la tabla de cnatidad de 				apariciones
-                  mov eax, [esi]; pongo en eax la cantidad de simbolos que tendra la tabla
-                  mov tam, eax; guardo una copia de la cantidad de simbolos que tendra la tabla
+                  mov esi, t_apariciones;pongo en esi el puntero a la tabla de cantidad de apariciones
+		  mov eax, tam
                   mov ebx, 9	;cantidad de bytes del nodo
                   mul ebx	;multiplico cantidad de nodos por cantidad bytes del nodo
                   push eax
@@ -36,22 +61,21 @@ inicializar:
 		  push esi
 		  call insertionSort	; ordeno la tabla de apariciones por frecuencia
 		  add esp, 8	;balanceo la pila
+		  mov ecx, tam
+		  mov eax, ptr_hojas; pongo en eax el puntero a las hojas
 ciclo_I:
-                  mov dl, [esi]	;pongo en dl el simbolo
-                  mov [eax], dl	;pongo en la hoja a la que estoy apuntando el caracter 
-                  lea eax, [eax + 1]	; y me muevo al campo frecuencia
-                  lea esi, [esi + 1]	; me muevo en la tabla apariciones a donde esta la 				frecuencia del simbolo
-                  mov edx, [esi]	; pongo en edx la frecuencia del simbolo
-                  mov [eax], edx	; pongo en la hoja que estoy apuntando la frecuencia
-                  lea eax, [eax + 4]	; me muevo al puntero al padre de la hoja
-                  lea esi, [esi + 4]	; me muevo al siguiente simbolo
-                  xor edx, edx		;pongo edx en cero
-                  mov [eax], edx	; porque voy a poner el puntero al padre en null
-                  lea eax, [eax + 4]	; me muevo a la siguiente hoja
+		  xor edx,edx
+                  mov dl, [esi + apar_simb]	;pongo en dl el simbolo
+                  mov [eax + hoja_simb], dl	;pongo en la hoja a la que estoy apuntando el caracter 
+                  mov edx, [esi + apar_frec]	; pongo en edx la frecuencia del simbolo
+                  mov [eax + hoja_frec], edx	; pongo en la hoja que estoy apuntando la frecuencia
+                  mov dword [eax + hoja_padre], 0	; porque voy a poner el puntero al padre en null
+                  lea esi, [esi + apar_sig]	; me muevo al siguiente simbolo
+                  lea eax, [eax + hoja_sig]	; me muevo a la siguiente hoja
                   loop ciclo_I		; repito esto hasta llegar al final de la tabla
 
 		  mov eax, tam	;pongo en eax la cantidad de hojas
-		  dec eax	;le resto 1 porque la cantidad de nodos internos es igual a la 			cantidad de hojas - 1
+		  dec eax	;le resto 1 porque la cantidad de nodos internos es igual a la cantidad de hojas - 1
 		  mov ebx, 16	; pongo en ebx la cantidad de bytes que tiene cada nodo
 		  mul ebx	; pongo en eax la cantidad de memoria a pedir 
 		  push eax
@@ -63,14 +87,11 @@ ciclo_I:
 		  dec ecx	; ahora ecx tiene la cantidad de nodos internos
 		  mov ebx, eax;pongo en ebx el puntero a los nodos internos
 inicializarNodos:
-		  mov [ebx], 0	; pongo el puntero al hijo izq en null
-		  lea ebx, [ebx + 4]	;avanzo al siguiente campo 
-		  mov [ebx], 0	; pongo el puntero al hijo der en null
-		  lea ebx, [ebx + 4]	;avanzo al siguiente campo
-		  mov [ebx], 0	; pongo la frecuencia en cero
-		  lea ebx, [ebx + 4]	;avanzo al siguiente campo
-		  mov [ebx], 0	; pongo el puntero al padre en null
-		  lea ebx, [ebx + 4]	;avanzo al siguiente nodo
+		  mov dword [ebx + nodo_izq], 0	; pongo el puntero al hijo izq en null
+		  mov dword [ebx + nodo_der], 0	; pongo el puntero al hijo der en null
+		  mov dword [ebx + nodo_frec], 0	; pongo la frecuencia en cero
+		  mov dword [ebx + nodo_padre], 0	; pongo el puntero al padre en null
+		  lea ebx, [ebx + nodo_sig]	;avanzo al siguiente nodo
 		  loop inicializarNodos	;repito esto hasta llegar al final de la estructura
 
 		  mov esi, ptr_hojas	; pongo en esi el puntero a las hojas
@@ -78,90 +99,84 @@ inicializarNodos:
 		  mov ecx, tam	; pongo en ecx la cantidad de hojas
 		  mov edx, ecx
 		  dec edx	; y en edx la cantidad de nodos internos
-		  mov ebx, edi	; pongo en ebx el puntero a los nodos internos
+		  mov ptr_agregar, edi
 crearPadrehh:
-		  mov [ebx], esi; pongo como hijo izq del nodo a la hoja apuntada por esi
-		  lea esi, [esi + 1] ; me muevo al campo frecuencia de la hoja
-		  mov eax, [esi]; pongo en eax la frecuencia de la hoja
-		  lea esi, [esi + 8]; me muevo a la siguiente hoja
-		  lea ebx, [ebx + 4]	; me muevo al campo hijo derecho del nodo interno
-		  mov [ebx], esi; pongo como hijo der del nodo a la hoja apuntada por esi
-		  lea esi, [esi + 1]; me muevo al campo frecuencia de la hoja
-		  add eax, [esi]; sumo las frecuencias
-		  lea ebx, [ebx + 4]; me muevo al campo frecuencia del nodo interno
-		  mov [ebx], eax; pongo en el campo frecuencia la suma de las frecuencias
-		  lea ebx, [ebx + 4];me muevo al campo padre del nodo interno
-		  mov [ebx], 0	; pongo el puntero al padre en null
-		  lea esi, [esi + 8]; me muevo a la siguiente hoja
+		  mov ebx, ptr_agregar	; pongo en ebx el puntero al ultimo nodo interno
+		  mov [ebx + nodo_izq], esi; pongo como hijo izq del nodo a la hoja apuntada por esi
+		  mov eax, [esi + hoja_frec]; pongo en eax la frecuencia de la hoja
+		  mov [esi + hoja_padre], ebx; pongo como padre al nodo
+		  lea esi, [esi + hoja_sig]; me muevo a la siguiente hoja
+		  mov [ebx + nodo_der], esi; pongo como hijo der del nodo a la hoja apuntada por esi
+		  add eax, [esi + hoja_frec]; sumo las frecuencias
+		  mov [ebx + nodo_frec], eax; pongo en el campo frecuencia la suma de las frecuencias
+		  mov dword [ebx + nodo_padre], 0	; pongo el puntero al padre en null
+		  mov [esi + hoja_padre], ebx; pongo como padre al nodo
+		  lea esi, [esi + hoja_sig]; me muevo a la siguiente hoja
+		  add dword ptr_agregar,16 ;apunto al lugar donde estara el siguiente nodo 
 		  sub ecx, 2;le resto dos para indicar que avance dos lugares en las hojas
 		  cmp ecx, 0;comparo si ya llegue a recorrer todas las hojas
 		  je seguirNodos;en caso afirmativo termino el arbol uniendo nodos
 armar_arbol:
 		  mov ebx, esi	; pongo en ebx el puntero a la hoja actual
-		  lea ebx, [ebx + 1] ; voy al campo frecuencia de la hoja
-		  mov eax, [ebx]; pongo en eax la frecuencia de la hoja
+		  mov eax, [ebx + hoja_frec]; pongo en eax la frecuencia de la hoja
 		  mov ebx, edi; pongo en ebx el puntero al nodo interno de menor frecuencia
-		  lea ebx, [ebx + 8]; voy al campo frecuencia de este nodo interno
-		  cmp eax, [ebx]; comparo las frecuencias de la hoja actual y el nodo actual
-		  jb compararh2n; comparo la segunda hoja con el nodo interno
-		  lea ebx, [ebx + 8];voy al siguiente nodo
-		  cmp [ebx], 0	;me fijo si el nodo existe
+		  cmp eax, [ebx + nodo_frec]; comparo las frecuencias de la hoja actual y el nodo actual
+		  jbe compararh2n; comparo la segunda hoja con el nodo interno
+		  cmp dword [ebx + nodo_sig], 0	;me fijo si el nodo existe
 		  je crearPadrenh;si no existe crea un nodo con la hoja y el nodo anterior
-		  lea ebx, [ebx + 8];voy a la frecuencia del nodo
-		  cmp eax, [ebx] ; comparo las frecuencias de la hoja actual y del nodo actual
+		  lea ebx, [ebx + nodo_sig]; si existe me posiciono en este nodo
+		  cmp eax, [ebx + nodo_frec] ; comparo las frecuencias de la hoja actual y del nodo actual
 		  jb crearPadrenh ;crea un nodo con la hoja y el nodo anterior
 		  jmp crearPadrenn;crea un nodo con los dos nodos internos
 compararh2n:
 		  mov eax, [ebx]; pongo en eax la frecuencia del nodo
-		  lea ebx, [esi + 10] ; con ebx apunto a la frecuencia de la segunda hoja de 				menor frecuencia no visitada
-		  cmp [ebx], eax; comparo la frecuencia de la hoja con la del nodo
-		  jb crearPadrehh
+		  lea ebx, [ebx + hoja_sig] ; avanzo a la siguiente hoja
+		  mov ebx, [esi + hoja_frec] ; con ebx apunto a la frecuencia de la segunda hoja de menor frecuencia no visitada
+		  cmp ebx, eax; comparo la frecuencia de la hoja con la del nodo
+		  jbe crearPadrehh
 		  jmp crearPadrenh 
+seguirNodos:
+		  cmp edx, 1
+		  je armar_tabla
+		  jmp crearPadrenn
 crearPadrenh:
-		  mov [ebx], esi; pongo como hijo izq del nodo a la hoja apuntada por esi
-		  lea esi, [esi + 1] ; me muevo al campo frecuencia de la hoja
-		  mov eax, [esi]; pongo en eax la frecuencia de la hoja
-		  lea esi, [esi + 8]; me muevo a la siguiente hoja
-		  lea ebx, [ebx + 4]	; me muevo al campo hijo derecho del nodo interno
-		  mov [ebx], edi; pongo como hijo der del nodo al nodo apuntado por edi
-		  lea edi, [edi + 8]; me muevo al campo frecuencia del nodo
-		  add eax, [edi]; sumo las frecuencias
-		  lea ebx, [ebx + 4]; me muevo al campo frecuencia del nodo interno
-		  mov [ebx], eax; pongo en el campo frecuencia la suma de las frecuencias
-		  lea ebx, [ebx + 4];me muevo al campo padre del nodo interno
-		  mov [ebx], 0	; pongo el puntero al padre en null
-		  lea edi, [edi + 4]; me muevo al siguiente nodo
+		  mov ebx, ptr_agregar	; pongo en ebx el puntero al ultimo nodo interno
+		  mov [ebx + nodo_izq], esi; pongo como hijo izq del nodo a la hoja apuntada por esi
+		  mov eax, [esi + hoja_frec]; pongo en eax la frecuencia de la hoja
+		  mov [esi + hoja_padre], ebx; pongo como padre al nodo
+		  lea esi, [esi + hoja_sig]; me muevo a la siguiente hoja
+		  mov [ebx + nodo_der], edi; pongo como hijo der del nodo al nodo apuntado por edi
+		  add eax, [edi + nodo_frec]; sumo las frecuencias
+		  mov [ebx + nodo_frec], eax; pongo en el campo frecuencia la suma de las frecuencias
+		  mov dword [ebx + nodo_padre], 0	; pongo el puntero al padre en null
+		  mov [edi + nodo_padre], ebx; pongo como padre al nodo
+		  lea edi, [edi + nodo_sig]; me muevo al siguiente nodo
+		  add dword ptr_agregar,16 ;apunto al lugar donde estara el siguiente nodo 
 		  dec ecx;le resto uno para indicar que avance un lugar en las hojas
 		  dec edx;le resto uno para indicar que avance un lugar en los nodos
 		  cmp ecx, 0;comparo si ya llegue a recorrer todas las hojas
 		  je seguirNodos;en caso afirmativo termino el arbol uniendo nodos
 		  jmp armar_arbol
 crearPadrenn:
-		  mov [ebx], edi; pongo como hijo izq del nodo al nodo apuntado por edi
-		  lea edi, [edi + 8] ; me muevo al campo frecuencia del nodo
-		  mov eax, [edi]; pongo en eax la frecuencia del nodo
-		  lea edi, [edi + 4]; me muevo al siguiente nodo
-		  lea ebx, [ebx + 4]	; me muevo al campo hijo derecho del nodo interno
-		  mov [ebx], edi; pongo como hijo der del nodo al nodo apuntado por edi
-		  lea edi, [edi + 8]; me muevo al campo frecuencia del nodo
-		  add eax, [edi]; sumo las frecuencias
-		  lea ebx, [ebx + 4]; me muevo al campo frecuencia del nodo interno
-		  mov [ebx], eax; pongo en el campo frecuencia la suma de las frecuencias
-		  lea ebx, [ebx + 4];me muevo al campo padre del nodo interno
-		  mov [ebx], 0	; pongo el puntero al padre en null
-		  lea edi, [edi + 4]; me muevo al siguiente nodo
+		  mov ebx, ptr_agregar	; pongo en ebx el puntero al ultimo nodo interno
+		  mov [ebx + nodo_izq], edi; pongo como hijo izq del nodo al nodo apuntado por edi
+		  mov eax, [edi + nodo_frec]; pongo en eax la frecuencia del nodo
+		  mov [edi + nodo_padre], ebx; pongo como padre al nodo
+		  lea edi, [edi + nodo_sig]; me muevo al siguiente nodo
+		  mov [ebx + nodo_der], edi; pongo como hijo der del nodo al nodo apuntado por edi
+		  add eax, [edi + nodo_frec]; sumo las frecuencias
+		  mov [ebx + nodo_frec], eax; pongo en el campo frecuencia la suma de las frecuencias
+		  mov dword [ebx + nodo_padre], 0	; pongo el puntero al padre en null
+		  mov [edi + nodo_padre], ebx; pongo como padre al nodo
+		  lea edi, [edi + nodo_sig]; me muevo al siguiente nodo
+		  add dword ptr_agregar,16 ;apunto al lugar donde estara el siguiente nodo 
 		  sub edx, 2;le resto dos para indicar que avance dos lugares en los nodos
 		  cmp ecx, 0;comparo si ya llegue a recorrer todas las hojas
 		  je seguirNodos;en caso afirmativo termino el arbol uniendo nodos
 		  jmp armar_arbol
-seguirNodos:
-		  cmp edx, 0
-		  je armar_tabla
-		  jmp crearPadrenn
 armar_tabla:
                   mov eax, tam;pongo en eax la cantidad de simbolos distintos
-		  mov edx, eax;pongo en edx la cantidad de simbolos distintos
-                  mov ebx, 6;pongo en ebx el tamaño de cada nodo
+                  mov ebx, 8;pongo en ebx el tamaño de cada nodo
                   mul ebx;pongo en eax la cantidad de memoria a pedir 
                   push eax
                   call malloc
@@ -170,58 +185,83 @@ armar_tabla:
                   jne llenar_tabla; si pudo lleno la tabla
                   jmp mem_error;sino envio un error de memoria
 llenar_tabla:
+		  mov tabla, eax
                   mov esi, ptr_hojas;pongo en esi el puntero a las hojas
-                  mov edi, eax; pongo en esi la estructura a devolver
-		  mov eax, edx;pongo en eax la cantidad de simbolos distintos
+                  mov edi, eax; pongo en edi la estructura a devolver
+		  mov eax, tam;pongo en eax la cantidad de simbolos distintos
+		  mov cuantosFaltan, eax
+		  mov eax, esi
 ag_simbolo:
-                  cmp eax, 0;me fijo si ya recorri todos los simbolos
+                  cmp dword cuantosFaltan , 0;me fijo si ya recorri todos los simbolos
                   je borrar_arbol; en este caso libero la memoria del arbol de huffman
-
-                  mov bl, [esi];pongo en bl el simbolo de la hoja actual
-                  mov [edi], bl;pongo en la tabla a devolver el simbolo
-                  lea edi, [edi + 1]; y me posiciono en la longitud del codigo
+		  xor ebx,ebx
+                  mov bl, [esi + hoja_simb];pongo en bl el simbolo de la hoja actual
+                  mov [edi + tabla_simb], bl;pongo en la tabla a devolver el simbolo
 
                   xor ebx, ebx; limpio ebx
                   xor ecx, ecx; limpio ecx
+		  mov edx, [esi + hoja_padre];pongo en edx la direccion del padre de la hoja
 ciclo:
-                  lea esi, [esi + 5]; voy al puntero al padre de la hoja
-                  lea edx, [esi];pongo en edx la direccion del padre de la hoja
-                  cmp [edx], esi; me fijo si la hoja es el hijo izquierdo
+                  cmp eax, [edx + nodo_izq]; me fijo si la hoja es el hijo izquierdo
                   je left;en caso afirmativo agrego un cero en el codigo e incremento la longitud
                   inc cl;sino incremento la longitud del codigo
                   shl ebx, 1; me corro un bit para la izquierda 
                   add ebx, 1; y pongo un uno en el bit menos significarivo
 seguir:
-                  lea edx, [edx + 12];voy al puntero al padre
-                  cmp [edx], 0; y lo comparo con null
+		  lea eax, [edx]
+                  mov edx, [edx + nodo_padre];voy al puntero al padre
+                  cmp edx, 0; y lo comparo con null
                   je setear_fila;si es null seteo la fila
                   jmp ciclo;sino sigo con el ciclo
 left:
                   inc cl;incremento la longitud del codigo
                   shl ebx, 1;me corro un bit para la izquierda 
+		  jmp seguir
 setear_fila:
-                  mov [edi], cl;pongo en longcod la longitud del codigo
-                  lea edi, [edi + 1];me muevo al campo cod
-                  mov [edi], ebx;pongo en cod el codigo
-                  lea edi, [edi + 4]; y avanzo a la siguiente fila de la tabla 
-                  dec eax; decremento eax
+                  mov [edi + tabla_longcod], cl;pongo en longcod la longitud del codigo
+		  mov cantBits, ecx
+		  jmp invertir
+next:
+                  mov [edi + tabla_cod], ecx;pongo en cod el codigo
+                  lea edi, [edi + tabla_sig]; y avanzo a la siguiente fila de la tabla 
+                  dec dword cuantosFaltan; decremento eax
+		  lea esi, [esi + hoja_sig]
+		  lea eax, [esi]; voy a la siguiente hoja
                   jmp ag_simbolo; y voy a agregar simbolo
+invertir:
+		  xor ecx, ecx
+cicloinv:
+		  clc
+		  dec dword cantBits
+		  shr ebx, 1
+		  jc ponerUno
+		  shl ecx, 1
+volver:
+		  cmp dword cantBits, 0
+		  jne cicloinv
+		  jmp next
+ponerUno:
+		  shl ecx, 1
+		  add ecx, 1
+		  jmp volver
 borrar_arbol:
 		  mov esi, ptr_hojas;pongo en esi el puntero a las hojas
 		  push esi
 		  call free;libero la memoria de las hojas
+		  add esp, 4
 		  mov esi, ptr_nodos; pòngo en esi el puntero a los nodos internos
 		  push esi
 		  call free; libero la memoria de los nodos internos
-		  mov eax, edi; pongo en eax la tabla de codigos
+		  add esp, 4
+		  mov eax, tabla; pongo en eax la tabla de codigos
 		  jmp fin
 mem_error:
-                  mov eax, -1	;pongo en eax un -1 para indicar error de memoria
+                  mov eax, 0	;pongo en eax un 0 para indicar error de memoria
 
 fin:
                   pop ebx
                   pop esi
                   pop edi
-		  add esp. 8
+		  add esp, 24
                   pop ebp
                   ret
