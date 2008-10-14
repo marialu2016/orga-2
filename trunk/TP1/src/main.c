@@ -55,7 +55,7 @@ extern apariciones* calcularApariciones( char* bufferImg, int tamImg, int ancho,
 extern codificacion* armarTablaCodigos( apariciones* tabla, int tam );
 extern char* cantBytesBstream( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash );
 extern int codificar( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash, char* bitstream);
-extern char* decodificar( codificacion* tabla, char* bitstream, long long tamBitstream, int trash );
+extern char* decodificar( codificacion* tabla, int tam_tabla,char* bitstream, int ancho, int basura, int tam );
 
 /*************************************************************************
 **              Funciones para el encabezado del BMP y OC2              **
