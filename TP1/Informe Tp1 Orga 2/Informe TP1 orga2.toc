@@ -1,0 +1,10 @@
+\select@language {spanish}
+\contentsline {section}{\numberline {1}Introducci\'on}{2}
+\contentsline {subsection}{\numberline {1.1}Codificacion de Huffman}{3}
+\contentsline {section}{\numberline {2}Desarrollo}{4}
+\contentsline {subsection}{\numberline {2.1}Calculando la cantidad de apariciones de cada s\IeC {\'\i }mbolo}{4}
+\contentsline {subsection}{\numberline {2.2}Representaci\'on del arbol de Huffman}{4}
+\contentsline {subsection}{\numberline {2.3}Codificar}{6}
+\contentsline {subsection}{\numberline {2.4}Decodificar}{8}
+\contentsline {section}{\numberline {3}Resultados}{9}
+\contentsline {section}{\numberline {4}Conclusiones}{9}
