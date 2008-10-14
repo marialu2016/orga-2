@@ -95,7 +95,7 @@ int main()
     char* bmpout;
 
     bmp2oc2(bmpin, bmpout);
-    /*printf( "Compresor-Descompresor de archivos Bmp-Oc2 \n\n" );
+    printf( "Compresor-Descompresor de archivos Bmp-Oc2 \n\n" );
     printf( "1) Comprimir archivo Bmp. \n" );
     printf( "2) Descomprimir archivo Oc2. \n" );
     printf( "3) salir \n\n" );
@@ -129,7 +129,7 @@ int main()
                     printf("Por favor, ingrese una opcion valida.\n");
                     break;
         }
-    }*/
+    }
 
     printf("\n Vuelva prontos!\n");
 
