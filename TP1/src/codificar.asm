@@ -87,12 +87,13 @@ saltar_linea:;como dice la etiqueta...
 	;dec dword bytesUtil
 
 	mov esi, trash
-	
+	dec esi
 	lea edi,[edi + esi]	; me posicion al siguiente simbolo
 	;mov esi, tabla	; uso esi(ptr) para recorrer tabla de codificacion
 	;mov dl, [ebx]	; en dl tengo el simbolo que quiero su codificacion
 	sub contadorBuff,esi
-	inc dword contadorBuff
+	mov esi, queTanLleno
+	;inc dword contadorBuff
 	;lea ebx, [ebx+1]
 	jmp buscar
 
@@ -104,7 +105,7 @@ busq_lineal:	;realiza busq lineal para devolver la codificacion
 	jmp busq_lineal
 
 termine:	
-	inc esi
+	;inc esi
 	xor ecx, ecx
 	mov ecx, esi
 	rol bl, cl
@@ -161,8 +162,8 @@ agrego_0:
 
 recargar:;mueve a bitstream y restaura el registro
 	mov [eax], bl	; transfiero a bstream
-	lea eax, [eax + 1]	; avanzo el ptr eax a los prox 32 bits
-	xor ebx, ebx	; limpio edi para la proxima carga a edi
+	lea eax, [eax + 1]	; avanzo el ptr eax a los prox 8 bits
+	xor ebx, ebx	; limpio ebx para la proxima carga a ebx
 	mov esi, 7	; cargo el contador que verifica si se llenó
 	jmp seguir
 	

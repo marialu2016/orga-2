@@ -16,7 +16,7 @@ insertionSort:
 	mov ecx, param_n; creo un contador de la longitud del arreglo
 	mov esi, param_tabla; apunta al puntero de la primera posición
 ciclo:	
-	cmp ecx, 0
+	cmp ecx, 1
 	je fin
 	dec ecx; decremento el contador de la long del arreglo
 	lea esi, [esi + 8]	; avanzo una posicion

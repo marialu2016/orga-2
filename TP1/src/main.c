@@ -55,7 +55,7 @@ extern void insertionSort (apariciones* tabla, int n);
 extern int tamTabla( char* bufferImg, int tamImg, int ancho, int trash );
 extern apariciones* calcularApariciones( char* bufferImg, int tamImg, int ancho, int trash);
 extern codificacion* armarTablaCodigos( apariciones* tabla, int tam );
-extern char* cantBytesBstream( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash );
+extern int cantBytesBstream(codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash, char** bitstream);
 extern int codificar( codificacion* tabla, char* bufferImg, int tamImg, int ancho, int trash, char* bitstream);
 extern char* decodificar( codificacion* tabla, int tam_tabla,char* bitstream, int ancho, int basura, int tam );
 
@@ -101,11 +101,11 @@ int main()
 
 //bmpout = readbmp(bmpin, h, ih);
 bmp2oc2(bmpin, oc2out);
-oc22bmp(oc2in, bmpout);
-    printf( "Compresor-Descompresor de archivos Bmp-Oc2 \n\n" );
+//oc22bmp(oc2in, bmpout);
+    /*printf( "Compresor-Descompresor de archivos Bmp-Oc2 \n\n" );
     printf( "1) Comprimir archivo Bmp. \n" );
     printf( "2) Descomprimir archivo Oc2. \n" );
-    printf( "3) salir \n\n" );
+    printf( "3) salir \n\n" );*/
 
     /*while( opcion != 3 )
     {
@@ -168,9 +168,9 @@ struct Oc2FileHeader* oh = &voh;
 
     trash = (ih->biWidth) % 4;
 
-    tam = tamTabla( bufferImg, ih->biSizeImage, ih->biWidth, trash );
+    tam = tamTabla( bufferImg, ih->biSizeImage, (ih->biWidth)*3, trash );
 
-    tabla_apariciones = calcularApariciones( bufferImg, ih->biSizeImage, ih->biWidth, trash);
+    tabla_apariciones = calcularApariciones( bufferImg, ih->biSizeImage, (ih->biWidth)*3, trash);
 
     codificacion* tabla_codigos;
     tabla_codigos = armarTablaCodigos( tabla_apariciones, tam);
@@ -179,15 +179,17 @@ struct Oc2FileHeader* oh = &voh;
 
     char* bufferOc2;
 
-    bufferOc2 = cantBytesBstream( tabla_codigos, bufferImg, ih->biSizeImage, ih->biWidth, trash );
+    int tamBitsBytes = cantBytesBstream(tabla_codigos, bufferImg, ih->biSizeImage, (ih->biWidth)*3, trash, &bufferOc2);
 
-    basura = codificar( tabla_codigos, bufferImg, ih->biSizeImage, ih->biWidth, trash, bufferOc2);
+    basura = codificar( tabla_codigos, bufferImg, ih->biSizeImage, (ih->biWidth)*3, trash, bufferOc2);
 
-    int tamBits = sizeof( bufferOc2 );
+    printf("la cantidad de bits del bitstream con basura es: %d\n", tamBitsBytes);
 
-    oh->bSize = (sizeof(bufferOc2) * 8) - basura;
+    oh->bSize = (tamBitsBytes * 8) - basura;
 
-    writeoc2( oc2out, h, ih, oh, tabla_codigos, oh->tSize, bufferOc2, tamBits );
+    printf("la cantidad de bits del bitstream es: %d\n", oh->bSize);
+
+    writeoc2( oc2out, h, ih, oh, tabla_codigos, tam, bufferOc2, tamBitsBytes );
 }
 
 void oc22bmp( char* oc2in, char* bmpout )
@@ -315,6 +317,7 @@ void writebmp( char* bmpout, header* h, infoHeader* ih, char* bufferImg )
 	fwrite( &(ih->biWidth), 4, 1, fp );
 	fwrite( &(ih->biHeight), 4, 1, fp );
 	fwrite( &(ih->biPlanes), 4, 1, fp );
+
 	fwrite( &(ih->biBitCount), 4, 1, fp );
 	fwrite( &(ih->biCompression), 4, 1, fp );
 	fwrite( &(ih->biSizeImage), 4, 1, fp );
@@ -414,7 +417,12 @@ void writeoc2( char* oc2out, header* h, infoHeader* ih, Oc2FileHeader* oh, codif
 	fwrite( &(oh->fType), 4, 1, fp );
 	fwrite( &(oh->tSize), 4, 1, fp );
 	fwrite( &(oh->bSize), 4, 1, fp );
-
+	int i;
+	printf("el tamaño de la tabla de codigos es: %d\n", tam);
+	for( i = 0; i< tam; i++)
+	{
+		printf("el elemento %d tiene el simbolo %d la longitud %d y el codigo %d\n", i, tabla[i].simbolo, tabla[i].longCod, tabla[i].cod);
+	}
 	fwrite( tabla, 8, tam, fp );
 
 	fwrite( bitstream, 1, tamBits, fp );
