@@ -9,6 +9,7 @@ section .text
 %define tamBuff [ebp + 16]
 %define ancho [ebp + 20]
 %define trash [ebp + 24]
+%define bitstream [ebp + 28]
 
 %define contadorBuff [ebp - 4]
 %define bytesUtil [ebp - 8]
@@ -17,8 +18,6 @@ section .text
 %define tabla_longcod 1
 %define tabla_cod 4
 %define tabla_sig 8
-
-; el algoritmo consiste en 3 etapas: pedido de memoria, busqueda sobre la tabla de codificacion de un simbolo en particular y escritura sobre bitstream bit a bit empleando mascaras. Estas tres partes estan en interaccion y estan delimitados en el siguiente codigo. La primera puede ser tratado de manera independiente con respecto a las ultimas dos, de modo que los registros en la etapa del pedido de memoria tienen un uso diferente al empleado en las ultimas 2 etapas.A su vez,en la busqueda de la codificacion y en la escritura sobre bitstream, los registros tienen un uso comun
 
 cantBytesBstream:
 	push ebp
@@ -64,7 +63,7 @@ escaneo_long:
 	lea esi,[esi + 1]	; me posiciono al siguiente simbolo
 	jmp busq_de_long
 
-prox_linea:;
+prox_linea:
 
 	mov ecx, ancho
 	mov dword bytesUtil, ecx	; bytesUtil = ancho
@@ -112,9 +111,12 @@ inic_reservar:
 	inc eax
 
 reservar:
+	mov ebx, eax
 	push eax
 	call malloc
 	add esp, 4
+	mov bitstream, eax
+	mov eax,ebx
 
 fin:
 	pop ebx
