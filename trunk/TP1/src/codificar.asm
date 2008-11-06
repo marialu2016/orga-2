@@ -9,7 +9,7 @@ section .text
 %define tamBuff [ebp + 16]
 %define ancho [ebp + 20]
 %define trash [ebp + 24]
-%define memoria [ebp + 28]
+%define tamBitstream [ebp + 28]
 
 %define contadorBuff [ebp - 4]
 %define queTanLleno [ebp - 8]
@@ -20,8 +20,6 @@ section .text
 %define tabla_longcod 1
 %define tabla_cod 4
 %define tabla_sig 8
-
-; el algoritmo consiste en 3 etapas: pedido de memoria, busqueda sobre la tabla de codificacion de un simbolo en particular y escritura sobre bitstream bit a bit empleando mascaras. Estas tres partes estan en interaccion y estan delimitados en el siguiente codigo. La primera puede ser tratado de manera independiente con respecto a las ultimas dos, de modo que los registros en la etapa del pedido de memoria tienen un uso diferente al empleado en las ultimas 2 etapas.A su vez,en la busqueda de la codificacion y en la escritura sobre bitstream, los registros tienen un uso comun
 
 codificar:
 	push ebp
@@ -38,7 +36,11 @@ codificar:
 
 ;ESTADO: eax:contiene la direccion de la memoria pedida
 ;	 el resto de los registros son libre de usar
-	mov eax, memoria
+	mov eax, tamBitstream
+	push eax
+	call malloc
+	add esp, 4
+	mov solucion, eax
 
 	mov ecx, tamBuff	; copio ecx para dar el tamaño de buffer
 	mov contadorBuff, ecx	; inicializo contador de long buffer
@@ -87,13 +89,13 @@ saltar_linea:;como dice la etiqueta...
 	;dec dword bytesUtil
 
 	mov esi, trash
-	dec esi
+	;dec esi
 	lea edi,[edi + esi]	; me posicion al siguiente simbolo
 	;mov esi, tabla	; uso esi(ptr) para recorrer tabla de codificacion
 	;mov dl, [ebx]	; en dl tengo el simbolo que quiero su codificacion
 	sub contadorBuff,esi
 	mov esi, queTanLleno
-	;inc dword contadorBuff
+	inc dword contadorBuff
 	;lea ebx, [ebx+1]
 	jmp buscar
 
@@ -112,7 +114,7 @@ termine:
 
 	mov [eax], bl	; transfiero a bstream
 
-	mov eax, esi	; muevo a eax el ptr solucion
+	mov eax, solucion
 	jmp fin
 
 guardar_cod:; guardo la codificacion
@@ -142,6 +144,7 @@ mover_sim:	; mueve bit a bit el simbolo codificado
 	cmp esi, 0; veo si me queda lugar en edi
 	je recargar
 	dec esi
+
 seguir:
 	shl edx, 1; muevo hacia derecha y cargo en carry el bit menos sig
 	jc agrego_1
@@ -171,6 +174,6 @@ fin:
 	pop ebx
 	pop esi
 	pop edi
-    add esp, 16
+    	add esp, 16
 	pop ebp
 	ret

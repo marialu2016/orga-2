@@ -114,8 +114,8 @@ crearPadrehh:
 		  lea esi, [esi + hoja_sig]; me muevo a la siguiente hoja
 		  add dword ptr_agregar,16 ;apunto al lugar donde estara el siguiente nodo 
 		  sub ecx, 2;le resto dos para indicar que avance dos lugares en las hojas
-		  cmp ecx, 0;comparo si ya llegue a recorrer todas las hojas
-		  je seguirNodos;en caso afirmativo termino el arbol uniendo nodos
+		  cmp ecx, 1;comparo si ya llegue a recorrer todas las hojas
+		  jbe seguirNodos;en caso afirmativo termino el arbol uniendo nodos
 armar_arbol:
 		  mov ebx, esi	; pongo en ebx el puntero a la hoja actual
 		  mov eax, [ebx + hoja_frec]; pongo en eax la frecuencia de la hoja
@@ -129,16 +129,12 @@ armar_arbol:
 		  jb crearPadrenh ;crea un nodo con la hoja y el nodo anterior
 		  jmp crearPadrenn;crea un nodo con los dos nodos internos
 compararh2n:
-		  mov eax, [ebx]; pongo en eax la frecuencia del nodo
+		  mov eax, [ebx + nodo_frec]; pongo en eax la frecuencia del nodo
 		  lea ebx, [ebx + hoja_sig] ; avanzo a la siguiente hoja
 		  mov ebx, [esi + hoja_frec] ; con ebx apunto a la frecuencia de la segunda hoja de menor frecuencia no visitada
 		  cmp ebx, eax; comparo la frecuencia de la hoja con la del nodo
 		  jbe crearPadrehh
 		  jmp crearPadrenh 
-seguirNodos:
-		  cmp edx, 1
-		  je armar_tabla
-		  jmp crearPadrenn
 crearPadrenh:
 		  mov ebx, ptr_agregar	; pongo en ebx el puntero al ultimo nodo interno
 		  mov [ebx + nodo_izq], esi; pongo como hijo izq del nodo a la hoja apuntada por esi
@@ -154,9 +150,20 @@ crearPadrenh:
 		  add dword ptr_agregar,16 ;apunto al lugar donde estara el siguiente nodo 
 		  dec ecx;le resto uno para indicar que avance un lugar en las hojas
 		  dec edx;le resto uno para indicar que avance un lugar en los nodos
-		  cmp ecx, 0;comparo si ya llegue a recorrer todas las hojas
-		  je seguirNodos;en caso afirmativo termino el arbol uniendo nodos
+		  cmp ecx, 1;comparo si ya llegue a recorrer todas las hojas
+		  jbe seguirNodos;en caso afirmativo termino el arbol uniendo nodos
 		  jmp armar_arbol
+seguirNodos:
+		  cmp edx, 1
+		  je armar_tabla
+		  cmp ecx, 0
+		  je crearPadrenn
+		  mov ebx, esi	; pongo en ebx el puntero a la hoja actual
+		  mov eax, [ebx + hoja_frec]; pongo en eax la frecuencia de la hoja
+		  mov ebx, edi; pongo en ebx el puntero al nodo interno de menor frecuencia
+		  cmp eax, [ebx + nodo_frec]; comparo las frecuencias de la hoja actual y el nodo actual
+		  jbe crearPadrenh
+		  jmp crearPadrenn
 crearPadrenn:
 		  mov ebx, ptr_agregar	; pongo en ebx el puntero al ultimo nodo interno
 		  mov [ebx + nodo_izq], edi; pongo como hijo izq del nodo al nodo apuntado por edi
@@ -171,9 +178,10 @@ crearPadrenn:
 		  lea edi, [edi + nodo_sig]; me muevo al siguiente nodo
 		  add dword ptr_agregar,16 ;apunto al lugar donde estara el siguiente nodo 
 		  sub edx, 2;le resto dos para indicar que avance dos lugares en los nodos
-		  cmp ecx, 0;comparo si ya llegue a recorrer todas las hojas
-		  je seguirNodos;en caso afirmativo termino el arbol uniendo nodos
+		  cmp ecx, 1;comparo si ya llegue a recorrer todas las hojas
+		  jbe seguirNodos;en caso afirmativo termino el arbol uniendo nodos
 		  jmp armar_arbol
+
 armar_tabla:
                   mov eax, tam;pongo en eax la cantidad de simbolos distintos
                   mov ebx, 8;pongo en ebx el tamaño de cada nodo

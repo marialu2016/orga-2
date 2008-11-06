@@ -52,12 +52,12 @@ reservar_mem:
     xor ecx, ecx
 
 escaneoSimb:
-    cmp dword LoQueMeFalta, 0
-    je terminar
+    ;cmp dword LoQueMeFalta, 0
+    ;je terminar
     mov eax, tabla
     mov bl, [esi]
     mov dword queTanVacio, 8
-    dec dword LoQueMeFalta
+    ;dec dword LoQueMeFalta
     lea esi, [esi + 1]
     jmp cicloint
 
@@ -72,8 +72,10 @@ fin:
 	ret
 
 cicloint:
-    cmp dword LoQueMeFalta, 0 ; si hay basura no la leo
-    je terminar
+    ;cmp dword LoQueMeFalta, 0
+    ;je terminar
+    ;dec dword LoQueMeFalta
+    clc
     cmp dword queTanVacio, 0
     je escaneoSimb
     mov contBits, ecx
@@ -99,8 +101,8 @@ poner_cero:
 
 buscar:
     cmp dword cont_tab, 0
-    je cicloint 
-    dec dword cont_tab
+    je cicloint
+    dec dword cont_tab 
     cmp cl, [eax + tabla_longcod]
     je cmpCod
 seguir:
@@ -120,6 +122,9 @@ asignar_Simb:
     je prox_fila
     xor ecx, ecx
     xor edx, edx
+    cmp dword LoQueMeFalta, 0
+    je terminar
+    dec dword LoQueMeFalta
     jmp cicloint
 
 prox_fila:
