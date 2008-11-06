@@ -106,17 +106,18 @@ inic_reservar:
 	mov ecx, 8
 	div dword ecx	; calculo el resto
 	cmp edx, 0
-	je reservar
+	je fin
+	;je reservar
 
 	inc eax
 
 reservar:
-	mov ebx, eax
-	push eax
-	call malloc
-	add esp, 4
-	mov bitstream, eax
-	mov eax,ebx
+	;mov ebx, eax
+	;push eax
+	;call malloc
+	;add esp, 4
+	;mov bitstream, eax
+	;mov eax,ebx
 
 fin:
 	pop ebx
