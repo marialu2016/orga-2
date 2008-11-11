@@ -37,7 +37,13 @@ typedef struct joc2FileHeader{
     char fType[4]; //es el string "JOC2"
     int bSize; //tamano en bits del bitstream
 
-}joc2FileHeader;
+} joc2FileHeader;
+
+typedef struct bufferRGB{
+    char* bufferR;
+    char* bufferG;
+    char* bufferB;
+} bufferRGB;
 
 /************************************************************************************
 **                              Funciones en C                                     **
@@ -54,17 +60,19 @@ void writejoc2( char* BufferjOc2, header* h, infoHeader* ih, joc2FileHeader* joh
 **                              Funciones en Assembler                             **
 ************************************************************************************/
 
-/*extern*/ char* dividirEnBloques( char* imgCanal, short int coord_i, short int coord_j );
+/*extern*/ char** dividirEnBloques( char* imgCanal, int coord_i, int coord_j );
 /*extern*/ float** generarDCT();
+/*extern*/ float** traspuesta( float** matriz );
+/*extern*/ void castear( char** matriz );
 /*extern*/ float DCTij(int i, int j);
 /*extern*/ float c( int i );
-/*extern*/ float* transformar( char* bloqueDe8x8 );
-/*extern*/ short int* cuantizar( float* bloqueTransf );
-/*extern*/ char* codificar( short int* bloqueCuant );
-/*extern*/ short int* decodificar( char* bitstream, char* ptr );
-/*extern*/ float* decuantizar( short int* bloqueCuant );
-/*extern*/ char* antiTransformar( float* bloqueTransf );
-/*extern*/ char* unirBloques( char* bufferCanal, char* bloque, short int coord_i, short int coord_j );
+/*extern*/ float** transformar( float** bloqueDe8x8 );
+/*extern*/ short int** cuantizar( float** bloqueTransf );
+/*extern*/ char* codificar( short int** bloqueCuant );
+/*extern*/ short int** decodificar( char* bitstream, char* ptr );
+/*extern*/ float** decuantizar( short int** bloqueCuant );
+/*extern*/ float** antiTransformar( float** bloqueTransf );
+/*extern*/ char* unirBloques( char* bufferCanal, char** bloque, int coord_i, int coord_j );
 
 /************************************************************************************
 **                     Funciones para el encabezado del BMP y OC2                  **
@@ -95,9 +103,79 @@ int main()
 ************************************************************************************/
 
 void bmp2joc2( char* bmpin, char* joc2out ){
+
+    /*bmp2joc2: programa principal para comprimir.*/
+
+    struct header vh;
+    struct infoHeader vih;
+    struct joc2FileHeader vjoh;
+    struct header* h = &vh;
+    struct infoHeader* ih = &vih;
+    struct joc2FileHeader* joh = &vjoh;
+    struct bufferRGB bf;
+    struct bufferRGB* bRGB = &bf;
+
+    char* bufferImg;
+    char* bufferJoc2;
+    char* bR = NULL;
+    char* bG = NULL;
+    char* bB = NULL;
+
+    bufferImg = readbmp( bmpin, h, ih );
+
+    long int i, j;
+
+    for( i = 0; i < ih->biSizeImage; i++ )
+    {
+        if( (i % 3) == 0 )
+        {
+            bR[i] = bufferImg[i];
+        }
+        else
+        {
+            if( (i % 3) == 1 )
+            {
+                bG[i] = bufferImg[i];
+            }
+            else
+            {
+                bB[i] = bufferImg[i];
+            }
+        }
+    }
+
+    joh->fType[0] = 'J';
+    joh->fType[1] = 'O';
+    joh->fType[2] = 'C';
+    joh->fType[3] = '2';
+
+    bRGB->bufferR = bR;
+    bRGB->bufferG = bG;
+    bRGB->bufferR = bR;
+
+    char* bloque;
+    char** matriz;
+    short int** mcuant;
+
+    for( i = 0; i <  (ih->biWidth / 3); i++ )
+    {
+        for( j = 0; j <  (ih->biWidth / 3); j++ )
+        {
+            bloque = dividirEnBloques( bR, i, j );
+            matriz = transformar( bloque );
+            mcuant = cuantizar( matriz );
+            bufferJoc2  = codificar( mcuant );
+            j += 8;
+        }
+
+        i += 8;
+    }
+
+
 }
 
 void joc22bmp( char* joc2in, char* bmpout ){
+    /*joc22bmp: programa principal para descomprimir.*/
 }
 
 char* readbmp( char* bmpin, header* h, infoHeader* ih ){
@@ -321,7 +399,7 @@ void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, c
 ************************************************************************************/
 
 
-/*extern*/ char* dividirEnBloques( char* imgCanal, short int coord_i, short int coord_j ){
+/*extern*/ char** dividirEnBloques( char* imgCanal, int coord_i, int coord_j ){
     return;
 }
 
@@ -359,6 +437,8 @@ void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, c
     float** dct = NULL;
     int i, j;
 
+    dct = malloc(4*64);
+
     for( i = 0; i < 8; i++ )
     {
         for( j = 0; j < 8; j++ )
@@ -370,34 +450,65 @@ void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, c
     return dct;
 }
 
-/*extern*/ float* transformar( char* bloqueDe8x8 ){
+/*extern*/ float** traspuesta( float** matriz ){
+
+    float** trsp = NULL;
+    int i, j;
+
+    trsp = malloc(4*64);
+
+    for( i = 0; i < 8; i++ )
+    {
+        for( j = 0; j < 8; j++ )
+        {
+            trsp[i][j] = matriz[j][i];
+        }
+    }
+
+    return trsp;
+}
+
+/*extern*/ void castear( char** matriz ){
+
+    int i, j;
+
+    for( i = 0; i < 8; i++ )
+    {
+        for( j = 0; j < 8; j++ )
+        {
+            matriz[i][j] = (float) matriz[i][j];
+        }
+    }
+}
+
+/*extern*/ float** transformar( float** bloqueDe8x8 ){
 
 
 
     return;
 }
 
-/*extern*/ short int* cuantizar( float* bloqueTransf ){
+/*extern*/ short int** cuantizar( float** bloqueTransf ){
     return;
 }
 
-/*extern*/ char* codificar( short int* bloqueCuant ){
+/*extern*/ char* codificar( short int** bloqueCuant ){
     return;
 }
 
-/*extern*/ short int* decodificar( char* bitstream, char* ptr ){
+/*extern*/ short int** decodificar( char* bitstream, char* ptr ){
     return;
 }
 
-/*extern*/ float* decuantizar( short int* bloqueCuant ){
+/*extern*/ float** decuantizar( short int** bloqueCuant ){
     return;
 }
 
-/*extern*/ char* antiTransformar( float* bloqueTransf ){
+/*extern*/ float** antiTransformar( float** bloqueTransf ){
     return;
 }
 
-/*extern*/ char* unirBloques( char* bufferCanal, char* bloque, short int coord_i, short int coord_j ){
+/*extern*/ char* unirBloques( char* bufferCanal, char** bloque, int coord_i, int coord_j ){
     return;
 }
 
