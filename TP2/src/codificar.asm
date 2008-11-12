@@ -38,123 +38,128 @@ codificar:
     mov ecx, eax
     mov byte ceros, 0
 
+    mov ebx, 1
+    xor edx, edx
+    xor ecx, ecx
+
 ciclo:
-    cmp eax, 7
-    je ciclo2
-    cmp word [esi + ebx], 0
-    jne agregarAv
-    add byte ceros, 1
-avanzar:
-    add ebx, 28
-    cmp word [esi + ebx], 0
-    jne agregarAv
-    add byte ceros, 1
-    loop avanzar
+    cmp ebx, 14
+    ja fin
+    cmp ebx, 7
+    ja post_ciclo
+aqui:
+    shr ebx,1
+    jc preDiagAb
+    shl ebx
+    mov ecx, ebx
+    jmp diagArriba
+preDiagAb:
+    shl ebx, 1
+    add ebx, 1
+    mov edx, ebx
+    jmp diagAbajo
+post_ciclo:
+    shr ebx,1
+    jc preDiagAb2
+    mov edx, ebx
+    sub edx, 7
+    mov ecx, ebx
+    sub ecx, edx
+    jmp diagArriba
+preDiagAb2:
+    mov ecx, ebx
+    sub ecx, 7
+    mov edx, ebx
+    sub edx, ecx
 
-    add eax, 1
-    mov ecx, eax
-    add ebx, 16
-    cmp word [esi + ebx], 0
-    jne agregarAt
-    add byte ceros, 1
-
-atrasar:
-    sub ebx, 28
-    cmp word [esi + ebx], 0
-    jne agregarAt
-    add byte ceros, 1
-    loop atrasar
-
-    add eax, 1
-    mov ecx, eax
-    cmp word [esi + ebx], 0
-    jne agregarC
-    add byte ceros, 1
-    add ebx, 2
+diagAbajo:
+    mov eax, edx
+    shl edx, 1
+    shl ecx, 4
+    add eax, ecx
+    shr ecx, 4
+    jmp genio
+seguir:
+    inc ecx
+    dec edx
+    add ecx, edx
+    cmp ebx, ecx
+    ja ciclar
+    sub ecx, edx
+    cmp ecx, 7
+    ja ciclar
+    mov eax, ecx
+    shl eax, 4
+    shl edx, 1
+    add eax, edx
+    shr edx, 1
+    jmp genio
+ciclar:
+    xor ecx, ecx
+    xor edx, edx
+    inc ebx
     jmp ciclo
+genio:
+    cmp [esi + eax], 0
+    je aumCeros
 
-agregaAv:
     mov dl, ceros
     mov byte [edi], ceros
     mov dx , [esi + ebx]
     mov [edi + 1], dx
     lea edi, [edi + 2]
     add dword memapedir, 1
-    jmp avanzar
-   
-agregarAt:
-    mov dl, ceros
-    mov byte [edi], ceros
-    mov dx , [esi + ebx]
-    mov [edi + 1], dx
-    lea edi, [edi + 2]
-    add dword memapedir, 1
-    jmp atrasar
+    mov byte ceros, 0
+    jmp seguir
+aumCeros:
+    add byte ceros, 1
+    jmp seguir
 
-agregarC:
-    mov dl, ceros
-    mov byte [edi], ceros
-    mov dx , [esi + ebx]
-    mov [edi + 1], dx
-    lea edi, [edi + 2]
-    add dword memapedir, 1
-    add ebx, 2
+diagArriba:
+    mov eax, ecx
+    shl eax, 4
+    shl edx, 1
+    add eax, edx
+    shr edx, 1
+    jmp genio2
+seguir2:
+    inc edx
+    dec ecx
+    add ecx, edx
+    cmp ebx, ecx
+    ja ciclar2
+    sub ecx, edx
+    cmp edx, 7
+    ja ciclar
+    mov eax, ecx
+    shl eax, 4
+    shl edx, 1
+    add eax, edx
+    shr edx, 1
+    jmp genio2
+ciclar2:
+    xor ecx, ecx
+    xor edx, edx
+    inc ebx
     jmp ciclo
+genio2:
+    cmp [esi + eax], 0
+    je aumCeros2
 
-ciclo2:
-    cmp eax, 0
-    je reservar
-    cmp word [esi + ebx], 0
-    jne agregarAt2
-    add byte ceros, 1
-atrasar2:
-    sub ebx, 28
-    cmp word [esi + ebx], 0
-    jne agregarAt2
-    add byte ceros, 1
-    loop atrasar2
-
-    sub eax, 1
-    mov ecx, eax
-    add ebx, 2
-    cmp word [esi + ebx], 0
-    jne agregarAv2
-    add byte ceros, 1
-
-avanzar2:
-    add ebx, 28
-    cmp word [esi + ebx], 0
-    jne agregarAv2
-    add byte ceros, 1
-    loop avanzar2
-
-    sub eax, 1
-    mov ecx, eax
-    add ebx, 16
-    jmp ciclo2
-
-agregaAv2:
     mov dl, ceros
     mov byte [edi], ceros
     mov dx , [esi + ebx]
     mov [edi + 1], dx
     lea edi, [edi + 2]
     add dword memapedir, 1
-    jmp avanzar
-   
-agregarAt2:
-    mov dl, ceros
-    mov byte [edi], ceros
-    mov dx , [esi + ebx]
-    mov [edi + 1], dx
-    lea edi, [edi + 2]
-    add dword memapedir, 1
-    jmp atrasar
+    mov byte ceros, 0
+    jmp seguir2
+aumCeros2:
+    add byte ceros, 1
+    jmp seguir2
 
 reservar:
-    
-    
-    
+
 fin:
     pop ebx
     pop esi

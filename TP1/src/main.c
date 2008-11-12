@@ -91,10 +91,10 @@ void writeoc2( char* BufferOc2, header* h, infoHeader* ih, Oc2FileHeader* oh, co
 int main()
 {
     int opcion = 0;
-    char* bmpin = "aa.bmp";
-    char* oc2out= "aa.oc2";
-    char* oc2in= "aa.oc2";
-    char* bmpout="aa2.bmp";
+    /*char* bmpin = "rapha.bmp";
+    char* oc2out= "rapha.oc2";
+    char* oc2in= "rapha.oc2";
+    char* bmpout="rapha2.bmp";*/
     /*char* bmpin = "simpson.bmp";
     char* oc2out= "simpson.oc2";
     char* oc2in= "simpson.oc2";
@@ -105,14 +105,20 @@ int main()
     char* bmpout="hola2.bmp";*/
 
 //bmpout = readbmp(bmpin, h, ih);
-bmp2oc2(bmpin, oc2out);
-oc22bmp(oc2in, bmpout);
-    /*printf( "Compresor-Descompresor de archivos Bmp-Oc2 \n\n" );
+//bmp2oc2(bmpin, oc2out);
+//oc22bmp(oc2in, bmpout);
+
+    char* bmpin;
+    char* oc2out;
+    char* oc2in;
+    char* bmpout;
+
+    printf( "Compresor-Descompresor de archivos Bmp-Oc2 \n\n" );
     printf( "1) Comprimir archivo Bmp. \n" );
     printf( "2) Descomprimir archivo Oc2. \n" );
-    printf( "3) salir \n\n" );*/
+    printf( "3) salir \n\n" );
 
-    /*while( opcion != 3 )
+    while( opcion != 3 )
     {
         printf( "Ingrese una opcion: \n" );
         opcion = getchar();
@@ -143,7 +149,7 @@ oc22bmp(oc2in, bmpout);
         }
     }
 
-    printf("\n Vuelva prontos!\n");*/
+    printf("\n Vuelva prontos!\n");
 
         return 0;
 }
