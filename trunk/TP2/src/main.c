@@ -35,7 +35,7 @@ typedef struct infoHeader{
 typedef struct joc2FileHeader{
 
     char fType[4]; //es el string "JOC2"
-    int bSize; //tamano en bits del bitstream
+    int bSize; //tamano en bytes del bitstream
 
 } joc2FileHeader;
 
@@ -49,7 +49,7 @@ int* generarQ();
 char* readbmp( char* bmpin, header* h, infoHeader* ih );
 void writebmp( char* bmpout, header* h, infoHeader* ih, char* bufferImg );
 char* readjoc2( char* joc2in, header* h, infoHeader* ih, joc2FileHeader* joh);
-void writejoc2( char* BufferjOc2, header* h, infoHeader* ih, joc2FileHeader* joh, char* bitstream, int tamBits );
+void writejoc2( char* BufferjOc2, header* h, infoHeader* ih, joc2FileHeader* joh, char* bR, char* bG, char* bB, int tamR, int tamG, int tamB );
 
 /************************************************************************************
 **                              Funciones en Assembler                             **
@@ -63,8 +63,8 @@ extern short int* cuantizar( float* bloqueTransf, int* q);
 extern char* codificar( short int* bloqueCuant, int* tam );
 extern short int* decodificar( char* bitstream, int* offset );
 extern float* decuantizar( short int* bloqueCuant, int* q );
-extern float* antiTransformar( float* bloqueTransf, float* DCT );
-extern char* unirBloques( char* bufferCanal, char* bloque, int coord_i, int coord_j, int ancho );
+extern void antiTransformar( float* bloqueTransf, float* DCT );
+extern void unirBloques( char* bufferCanal, char* bloque, int coord_i, int coord_j, int ancho );
 
 /************************************************************************************
 **                     Funciones para el encabezado del BMP y OC2                  **
@@ -86,7 +86,15 @@ long long int tamImgJoc2( joc2FileHeader* h);
 
 int main()
 {
-    printf("Hello world!\n");
+    char* bmpin = "test.bmp";
+    char* joc2out = "test.joc2";
+    char* joc2in = "test.joc2";
+    char* bmpout = "test2.bmp";
+
+    bmp2joc2( bmpin, joc2out );
+    //joc22bmp( joc2in, bmpout );
+
+    printf("vuelva prontos!\n");
     return 0;
 }
 
@@ -112,6 +120,15 @@ void bmp2joc2( char* bmpin, char* joc2out ){
     char* bR = NULL;
     char* bG = NULL;
     char* bB = NULL;
+    char* bitstreamR = NULL;
+    char* bitstreamG = NULL;
+    char* bitstreamB = NULL;
+    int tamBufferR = 0;
+    int tamBufferG = 0;
+    int tamBufferB = 0;
+    char* ptr_R;
+    char* ptr_G;
+    char* ptr_B;
 
     char* bloque;
     char* matriz;
@@ -121,7 +138,6 @@ void bmp2joc2( char* bmpin, char* joc2out ){
 
     long int i, j;
     int tam = 0;
-    int* ptr_tam = &tam;
 
     bufferImg = readbmp( bmpin, h, ih );
 
@@ -129,23 +145,31 @@ void bmp2joc2( char* bmpin, char* joc2out ){
     bG = malloc( (ih->biWidth)*(ih->biHeight) );
     bB = malloc( (ih->biWidth)*(ih->biHeight) );
 
-    for( i = 0; i < ih->biWidth; i++ )
+    bitstreamR = malloc( (ih->biWidth)*(ih->biHeight) );
+    bitstreamG = malloc( (ih->biWidth)*(ih->biHeight) );
+    bitstreamB = malloc( (ih->biWidth)*(ih->biHeight) );
+
+    ptr_R = bitstreamR;
+    ptr_G = bitstreamG;
+    ptr_B = bitstreamB;
+
+    for( i = 0; i < (ih->biHeight)*3; i++ )
     {
-        for(j = 0; j < ih->biHeight; j++)
+        for(j = 0; j < (ih->biWidth)*3; j++)
         {
             if( (j % 3) == 0 )
             {
-                bR[i][j] = bufferImg[i][j];
+                bR[i/3][j/3] = bufferImg[i][j];
             }
             else
             {
                 if( (j % 3) == 1 )
                 {
-                    bG[i][j] = bufferImg[i][j];
+                    bG[i/3][j/3] = bufferImg[i][j];
                 }
                 else
                 {
-                    bB[i][j] = bufferImg[i][j];
+                    bB[i/3][j/3] = bufferImg[i][j];
                 }
             }
         }
@@ -159,46 +183,104 @@ void bmp2joc2( char* bmpin, char* joc2out ){
     DCT = generarDCT();
     Q = generarQ();
 
-    for( i = 0; i <  (ih->biWidth * 3); i+= 8 )
+    for( i = 0; i <  ih->biWidth; i+= 8 )
     {
-        for( j = 0; j <  (ih->biWidth * 3); j+= 8 )
+        for( j = 0; j <  ih->biHeight; j+= 8 )
         {
             bloque = dividirBloques( bR, i, j, ih->biWidth);
-            matriz = transformar( bloque , DCT );
-            mcuant = cuantizar( matriz, Q );
-            bufferJoc2  = codificar( mcuant, ptr_tam );
+            transformar( bloque , DCT );
+            mcuant = cuantizar( bloque, Q );
+            bufferJoc2  = codificar( mcuant, &tam );
+            tamBufferR = tamBufferR + tam;
+            memcpy( ptr_R, bufferJoc2, tam );
+            ptr_R = ptr_R + tam;
         }
-        bitstreamR
     }
 
-    for( i = 0; i <  (ih->biWidth * 3); i+= 8 )
+    for( i = 0; i <  ih->biWidth ; i+= 8 )
     {
-        for( j = 0; j <  (ih->biWidth * 3); j+= 8 )
+        for( j = 0; j <  ih->biHeight; j+= 8 )
         {
             bloque = dividirBloques( bG, i, j, ih->biWidth );
-            matriz = transformar( bloque , DCT );
-            mcuant = cuantizar( matriz, Q );
-            bufferJoc2  = codificar( mcuant, ptr_tam );
+            transformar( bloque , DCT );
+            mcuant = cuantizar( bloque, Q );
+            bufferJoc2  = codificar( mcuant, &tam );
+            tamBufferG = tamBufferG + tam;
+            memcpy( ptr_G, bufferJoc2, tam );
+            ptr_G = ptr_G + tam;
         }
     }
 
-    for( i = 0; i <  (ih->biWidth * 3); i+= 8 )
+    for( i = 0; i <  ih->biWidth; i+= 8 )
     {
-        for( j = 0; j <  (ih->biWidth * 3); j+= 8 )
+        for( j = 0; j <  ih->biHeight; j+= 8 )
         {
             bloque = dividirBloques( bB, i, j, ih->biWidth );
-            matriz = transformar( bloque , DCT );
-            mcuant = cuantizar( matriz, Q );
-            bufferJoc2  = codificar( mcuant, ptr_tam );
+            transformar( bloque , DCT );
+            mcuant = cuantizar( bloque, Q );
+            bufferJoc2  = codificar( mcuant, &tam );
+            tamBufferB = tamBufferB + tam;
+            memcpy( ptr_B, bufferJoc2, tam );
+            ptr_B = ptr_B + tam;
         }
     }
-
-    writejoc2(joc2out, h,  ih, joh, rR, bG, bB);
+    joh->bSize = tamBufferR + tamBufferG + tamBufferB;
+    writejoc2(joc2out, h,  ih, joh, bitstreamR, bitstreamG,bitstreamB, tamBufferR, tamBufferG, tamBufferB);
 
 }
 
 void joc22bmp( char* joc2in, char* bmpout ){
     /*joc22bmp: programa principal para descomprimir.*/
+    struct header vh;
+    struct infoHeader vih;
+    struct joc2FileHeader vjoh;
+    struct header* h = &vh;
+    struct infoHeader* ih = &vih;
+    struct joc2FileHeader* joh = &vjoh;
+    struct bufferRGB bf;
+    struct bufferRGB* bRGB = &bf;
+
+    char* bitstream;
+    char* bufferImg;
+    char* bR = NULL;
+    char* bG = NULL;
+    char* bB = NULL;
+    char* bitstreamR = NULL;
+    char* bitstreamG = NULL;
+    char* bitstreamB = NULL;
+    int tamBufferR = 0;
+    int tamBufferG = 0;
+    int tamBufferB = 0;
+    char* ptr_R;
+    char* ptr_G;
+    char* ptr_B;
+
+    char* bloque;
+    char* matriz;
+    short int* mcuant;
+    float* DCT = NULL;
+    int* Q;
+
+    long int i, j;
+    int tam = 0;
+    int offset = 0;
+
+    bitstream = readjoc2( joc2in, h, ih, oh );
+
+    DCT = generarDCT();
+    Q = generarQ();
+
+    i = j = 0;
+    while( offset < joh->bSize )
+    {
+        mcuant = decodificar( bitstream, &offset);
+        bloque = descuantizar( mcuant, Q );
+        antitransformar( bloque, DCT );
+        unirBloques( canal, bloque, i, j, ih->biWidth );
+        i=+8;
+        j=+8;
+    }
+
 }
 
 char* readbmp( char* bmpin, header* h, infoHeader* ih ){
@@ -320,7 +402,7 @@ char* readjoc2( char* joc2in, header* h, infoHeader* ih, joc2FileHeader* joh){
                 /*cargo el joc2FileHeader*/
 
                 fread( &(joh->fType), 4, 1, fp );
-                fread( &(joh->bSize), 8, 1, fp );
+                fread( &(joh->bSize), 4, 1, fp );
 
                 /*Cargo el header*/
 
@@ -348,7 +430,7 @@ char* readjoc2( char* joc2in, header* h, infoHeader* ih, joc2FileHeader* joh){
                 {
                     /*transformo el tamaño que esta en Bytes a bits*/
 
-                    tamBits = ( joh->bSize / 8 ) + 1;
+                    tamBits = joh->bSize;
 
                     /*reservo memoria para el bitstream*/
 
@@ -384,7 +466,7 @@ int* generarQ(){
     return Q;
 }
 
-void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, char* bR, char* bG, char* bB )
+void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, char* bR, char* bG, char* bB, int tamR, int tamG, int tamB )
 {
 
     /*writejoc2: escribe el header del .joc2, el header y el infoHeader del .bmp y copia el bitstream
@@ -403,7 +485,7 @@ void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, c
             /*escribo el joc3FlileHeader de joc2*/
 
             fwrite( &(joh->fType), 4, 1, fp );
-            fwrite( &(joh->bSize), 8, 1, fp );
+            fwrite( &(joh->bSize), 4, 1, fp );
 
             /*escribo el header del BMP*/
 
@@ -429,7 +511,9 @@ void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, c
 
             /*escribo el bitstram*/
 
-            fwrite( bitstream, 1, tamBits, fp );
+            fwrite( bR, 1, tamR, fp );
+            fwrite( bG, 1, tamG, fp );
+            fwrite( bB, 1, tamB, fp );
     }
 
     fclose(fp);
