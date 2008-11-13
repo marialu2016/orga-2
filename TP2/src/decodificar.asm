@@ -1,48 +1,44 @@
-global codificar
+global decodificar
 
 extern malloc
-extern free
 
 section .text
 
-%define bq [ebp + 8]
-%define tam [ebp + 12]
+%define bitstream [ebp + 8]
+%define offset [ebp + 12]
 
-%define resultado [ebp - 4]
-%define ceros [ebp - 8]
-%define memapedir [ebp - 12]
+%define res [ebp - 4]
+%define vlocal [ebp - 8]
+%define ceros [ebp - 12]
 
-codificar:
+decodificar:
     push ebp
     mov ebp, esp
-    sub esp, 12
+    sub esp, 4
     push edi
     push esi
     push ebx
 
-    mov eax, 129
-    push eax
+    mov esi, offset ; o podria ser mov esi, bitstream y luego lea esi, [esi + offset]
+    
+    mov eax, 64
+    shl eax, 1
     call malloc
-
+    add esp, 12
     mov edi, eax
-    mov resultado, eax
-    mov esi, bq
-    xor eax, eax
+    mov res, eax
+
     xor ebx, ebx
-    xor ecx, ecx
-    xor edx, edx
+    xor eax, eax   
+    xor edx, edx 
 
-    mov dx, [esi]
-    mov [edi], dx
-    add ebx, 2
+    mov bl, [esi]
+    mov [edi], bx
     lea edi, [edi + 2]
-    add eax, 1
-    mov ecx, eax
-    mov byte ceros, 0
-
-    mov ebx, 1
-    xor edx, edx
-    xor ecx, ecx
+    lea esi, [esi + 1]
+    mov bl, [esi]
+    mov ceros, ebx
+    lea esi, [esi + 1]
 
 ciclo:
     cmp ebx, 14
@@ -80,7 +76,7 @@ diagAbajo:
     shl ecx, 4
     add eax, ecx
     shr ecx, 4
-    jmp genio
+    jmp agregar
 seguir:
     inc ecx
     dec edx
@@ -95,26 +91,26 @@ seguir:
     shl edx, 1
     add eax, edx
     shr edx, 1
-    jmp genio
+    jmp agregar
 ciclar:
     xor ecx, ecx
     xor edx, edx
     inc ebx
     jmp ciclo
-genio:
-    cmp [esi + eax], 0
-    je aumCeros
-
-    mov dl, ceros
-    mov byte [edi], ceros
-    mov dx , [esi + ebx]
-    mov [edi + 1], dx
-    lea edi, [edi + 2]
-    add dword memapedir, 1
-    mov byte ceros, 0
+agregar:
+    cmp ceros, 0
+    jne ag_cero
+    mov vlocal, ebx
+    xor ebx, ebx
+    mov bl, [esi]
+    mov [edi + eax], bx
+    lea esi, [esi + 1]
+    mov bl, [esi]
+    mov ceros, ebx
+    lea esi, [esi + 1]
     jmp seguir
-aumCeros:
-    add byte ceros, 1
+ag_cero:
+    mov dword [edi + eax], 0
     jmp seguir
 
 diagArriba:
@@ -123,7 +119,7 @@ diagArriba:
     shl edx, 1
     add eax, edx
     shr edx, 1
-    jmp genio2
+    jmp agregar2
 seguir2:
     inc edx
     dec ecx
@@ -138,55 +134,32 @@ seguir2:
     shl edx, 1
     add eax, edx
     shr edx, 1
-    jmp genio2
+    jmp agregar2
 ciclar2:
     xor ecx, ecx
     xor edx, edx
     inc ebx
     jmp ciclo
-genio2:
-    cmp [esi + eax], 0
-    je aumCeros2
-
-    mov dl, ceros
-    mov byte [edi], ceros
-    mov dx , [esi + ebx]
-    mov [edi + 1], dx
-    lea edi, [edi + 2]
-    add dword memapedir, 1
-    mov byte ceros, 0
-    jmp seguir2
-aumCeros2:
-    add byte ceros, 1
-    jmp seguir2
-
-reservar:
-    mov eax, memapedir
-    push eax
-    call malloc
-    add esp, 4
-    
-    mov edi, eax
-    mov esi, resultado
-    mov ecx, memapedir
-    xor edx, edx
-    mov tam, ecx
-
-copiar:
-    mov dl, [esi]
-    mov [edi], dl
+agregar2:
+    cmp ceros, 0
+    jne ag_cero2
+    mov vlocal, ebx
+    xor ebx, ebx
+    mov bl, [esi]
+    mov [edi + eax], bx
     lea esi, [esi + 1]
-    lea edi, [edi + 1]
-    loop copiar
-
-    mov ebx, eax
-    mov esi, resultado
-    push esi
-    call free
-    add esp, 4
-    mov eax, ebx 
+    mov bl, [esi]
+    mov ceros, ebx
+    lea esi, [esi + 1]
+    jmp seguir2
+ag_cero2:
+    mov dword [edi + eax], 0
+    jmp seguir2
+    
+     
 
 fin:
+    mov eax, res
     pop ebx
     pop esi
     pop edi
