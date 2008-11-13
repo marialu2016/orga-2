@@ -35,32 +35,32 @@ cicloCol:
     cmp ecx, 0
     je mult1
 
-    movaps xmm1, [esi]
-    movaps xmm2, [esi + 16]
-    movaps xmm3, [edi + ebx]
+    movups xmm1, [esi]
+    movups xmm2, [esi + 16]
+    movups xmm3, [edi + ebx]
     add ebx, 16
-    movaps xmm4, [edi + ebx]
+    movups xmm4, [edi + ebx]
     add ebx, 16
     mulps xmm3, xmm1
     mulps xmm4, xmm2
     addps xmm3, xmm4
-    shufps xmm4, xmm3, 10110000
+    shufps xmm4, xmm3, 10110000b
     addps xmm3, xmm4
-    shufps xmm4, xmm3, 01000000
+    shufps xmm4, xmm3, 01000000b
     addps xmm3, xmm4
     movss [eax], xmm3
     lea eax, [eax + 4]
 
-    movaps xmm5, [edi + ebx]
+    movups xmm5, [edi + ebx]
     add ebx, 16
-    movaps xmm6, [edi + ebx]
+    movups xmm6, [edi + ebx]
     add ebx, 16
     mulps xmm5, xmm1
     mulps xmm6, xmm2
     addps xmm5, xmm6
-    shufps xmm6, xmm5, 10110000
+    shufps xmm6, xmm5, 10110000b
     addps xmm5, xmm6
-    shufps xmm6, xmm5, 01000000
+    shufps xmm6, xmm5, 01000000b
     addps xmm5, xmm6
     movss [eax], xmm5
     lea eax, [eax + 4]
@@ -86,32 +86,32 @@ cicloCol2:
     cmp ecx, 0
     je mult2
 
-    movaps xmm1, [esi]
-    movaps xmm2, [esi + 16]
-    movaps xmm3, [edi + ebx]
+    movups xmm1, [esi]
+    movups xmm2, [esi + 16]
+    movups xmm3, [edi + ebx]
     add ebx, 16
-    movaps xmm4, [edi + ebx]
+    movups xmm4, [edi + ebx]
     add ebx, 16
     mulps xmm3, xmm1
     mulps xmm4, xmm2
     addps xmm3, xmm4
-    shufps xmm4, xmm3, 10110000
+    shufps xmm4, xmm3, 10110000b
     addps xmm3, xmm4
-    shufps xmm4, xmm3, 01000000
+    shufps xmm4, xmm3, 01000000b
     addps xmm3, xmm4
     movss [eax], xmm3
     lea eax, [eax + 4]
 
-    movaps xmm5, [edi + ebx]
+    movups xmm5, [edi + ebx]
     add ebx, 16
-    movaps xmm6, [edi + ebx]
+    movups xmm6, [edi + ebx]
     add ebx, 16
     mulps xmm5, xmm1
     mulps xmm6, xmm2
     addps xmm5, xmm6
-    shufps xmm6, xmm5, 10110000
+    shufps xmm6, xmm5, 10110000b
     addps xmm5, xmm6
-    shufps xmm6, xmm5, 01000000
+    shufps xmm6, xmm5, 01000000b
     addps xmm5, xmm6
     movss [eax], xmm5
     lea eax, [eax + 4]
@@ -128,8 +128,9 @@ mult2:
 
 terminar:
 	mov eax, resultado
-	push eax
-	call free
+	;push eax
+	;call free
+        ;add esp, 4
     
 fin:
     pop ebx

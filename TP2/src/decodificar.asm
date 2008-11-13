@@ -42,13 +42,13 @@ decodificar:
 
 ciclo:
     cmp ebx, 14
-    ja fin
+    ja termine
     cmp ebx, 7
     ja post_ciclo
 aqui:
     shr ebx,1
     jc preDiagAb
-    shl ebx
+    shl ebx, 1
     mov ecx, ebx
     jmp diagArriba
 preDiagAb:
@@ -77,6 +77,8 @@ diagAbajo:
     add eax, ecx
     shr ecx, 4
     jmp agregar
+termine:
+    jmp fin
 seguir:
     inc ecx
     dec edx
@@ -98,7 +100,7 @@ ciclar:
     inc ebx
     jmp ciclo
 agregar:
-    cmp ceros, 0
+    cmp byte ceros, 0
     jne ag_cero
     mov vlocal, ebx
     xor ebx, ebx
@@ -141,7 +143,7 @@ ciclar2:
     inc ebx
     jmp ciclo
 agregar2:
-    cmp ceros, 0
+    cmp byte ceros, 0
     jne ag_cero2
     mov vlocal, ebx
     xor ebx, ebx

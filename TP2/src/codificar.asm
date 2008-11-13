@@ -46,13 +46,13 @@ codificar:
 
 ciclo:
     cmp ebx, 14
-    ja fin
+    ja termine
     cmp ebx, 7
     ja post_ciclo
 aqui:
     shr ebx,1
     jc preDiagAb
-    shl ebx
+    shl ebx, 1
     mov ecx, ebx
     jmp diagArriba
 preDiagAb:
@@ -81,6 +81,8 @@ diagAbajo:
     add eax, ecx
     shr ecx, 4
     jmp genio
+termine:
+    jmp fin
 seguir:
     inc ecx
     dec edx
@@ -102,11 +104,11 @@ ciclar:
     inc ebx
     jmp ciclo
 genio:
-    cmp [esi + eax], 0
+    cmp word [esi + eax], 0
     je aumCeros
 
     mov dl, ceros
-    mov byte [edi], ceros
+    mov [edi], dl
     mov dx , [esi + ebx]
     mov [edi + 1], dx
     lea edi, [edi + 2]
@@ -145,11 +147,11 @@ ciclar2:
     inc ebx
     jmp ciclo
 genio2:
-    cmp [esi + eax], 0
+    cmp word [esi + eax], 0
     je aumCeros2
 
     mov dl, ceros
-    mov byte [edi], ceros
+    mov [edi], dl
     mov dx , [esi + ebx]
     mov [edi + 1], dx
     lea edi, [edi + 2]
