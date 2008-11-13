@@ -8,6 +8,7 @@ section .text
 %define bloque [ebp + 12]
 %define coord_i [ebp + 16]
 %define coord_j [ebp + 20]
+%define ancho [ebp + 24]
 
 unirBloques:
 	push ebp
