@@ -18,41 +18,41 @@ descuantizar:
     mov ecx, 8
     xor ebx, ebx
     xor eax, eax
-div:    
+divt:    
     cmp ecx, 0
     je fin
 
-    movaps xmm0, [esi + ebx]
-    movaps xmm2, [edi + ebx]
+    movups xmm0, [esi + ebx]
+    movups xmm2, [edi + ebx]
     add ebx, 16
-    movaps xmm1, [esi + ebx]
-    movaps xmm3, [edi + ebx]
+    movups xmm1, [esi + ebx]
+    movups xmm3, [edi + ebx]
     add ebx, 16
 
     mulps xmm0, xmm2
     mulps xmm1, xmm3
 
-    movaps xmm4, [esi + ebx]
-    movaps xmm6, [edi + ebx]
+    movups xmm4, [esi + ebx]
+    movups xmm6, [edi + ebx]
     add ebx, 16
-    movaps xmm5, [esi + ebx]
-    movaps xmm7, [edi + ebx]
+    movups xmm5, [esi + ebx]
+    movups xmm7, [edi + ebx]
     add ebx, 16
 
     mulps xmm4, xmm6
     mulps xmm5, xmm7
 
-    movaps [edi + eax], xmm0
+    movups [edi + eax], xmm0
     add eax, 16
-    movaps [edi + eax], xmm1
+    movups [edi + eax], xmm1
     add eax, 16
-    movaps [edi + eax], xmm4
+    movups [edi + eax], xmm4
     add eax, 16
-    movaps [edi + eax], xmm5
+    movups [edi + eax], xmm5
     add eax, 16
 
     sub ecx, 2
-    jmp div
+    jmp divt
 fin:
     pop ebx
     pop esi

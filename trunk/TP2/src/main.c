@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include "string.h"
 
 /************************************************************************************
 **                              Estructuras principales                            **
@@ -55,7 +55,7 @@ void writejoc2( char* BufferjOc2, header* h, infoHeader* ih, joc2FileHeader* joh
 **                              Funciones en Assembler                             **
 ************************************************************************************/
 
-extern char* dividirBloques( char* imgCanal, int coord_i, int coord_j, int ancho );
+extern float* dividirBloques( char* imgCanal, int coord_i, int coord_j, int ancho );
 extern float* generarDCT();
 extern float* traspuesta( float* matriz );
 extern void transformar( float* bloqueDe8x8, float* DCT );
@@ -88,8 +88,8 @@ int main()
 {
     char* bmpin = "test.bmp";
     char* joc2out = "test.joc2";
-    char* joc2in = "test.joc2";
-    char* bmpout = "test2.bmp";
+    //char* joc2in = "test.joc2";
+    //char* bmpout = "test2.bmp";
 
     bmp2joc2( bmpin, joc2out );
     //joc22bmp( joc2in, bmpout );
@@ -102,7 +102,8 @@ int main()
 **                     Implementacion: Funciones en C                              **
 ************************************************************************************/
 
-void bmp2joc2( char* bmpin, char* joc2out ){
+void bmp2joc2( char* bmpin, char* joc2out )
+{
 
     /*bmp2joc2: programa principal para comprimir.*/
 
@@ -112,8 +113,6 @@ void bmp2joc2( char* bmpin, char* joc2out ){
     struct header* h = &vh;
     struct infoHeader* ih = &vih;
     struct joc2FileHeader* joh = &vjoh;
-    struct bufferRGB bf;
-    struct bufferRGB* bRGB = &bf;
 
     char* bufferImg;
     char* bufferJoc2;
@@ -130,13 +129,12 @@ void bmp2joc2( char* bmpin, char* joc2out ){
     char* ptr_G;
     char* ptr_B;
 
-    char* bloque;
-    char* matriz;
+    float* bloque;
     short int* mcuant;
     float* DCT = NULL;
     int* Q;
 
-    long int i, j;
+    long int i, j, k;
     int tam = 0;
 
     bufferImg = readbmp( bmpin, h, ih );
@@ -153,26 +151,16 @@ void bmp2joc2( char* bmpin, char* joc2out ){
     ptr_G = bitstreamG;
     ptr_B = bitstreamB;
 
-    for( i = 0; i < (ih->biHeight)*3; i++ )
+    for( i = 0; i < ih->biSizeImage; i++ )
     {
-        for(j = 0; j < (ih->biWidth)*3; j++)
-        {
-            if( (j % 3) == 0 )
-            {
-                bR[i/3][j/3] = bufferImg[i][j];
-            }
-            else
-            {
-                if( (j % 3) == 1 )
-                {
-                    bG[i/3][j/3] = bufferImg[i][j];
-                }
-                else
-                {
-                    bB[i/3][j/3] = bufferImg[i][j];
-                }
-            }
-        }
+	    k = i/3;
+	    bR[k] = bufferImg[i];
+	    i++;
+	    k = i/3;
+	    bG[k] = bufferImg[i];
+	    i++;
+	    k = i/3;
+	    bB[k] = bufferImg[i];
     }
 
     joh->fType[0] = 'J';
@@ -229,16 +217,14 @@ void bmp2joc2( char* bmpin, char* joc2out ){
 
 }
 
-void joc22bmp( char* joc2in, char* bmpout ){
+/*void joc22bmp( char* joc2in, char* bmpout ){*/
     /*joc22bmp: programa principal para descomprimir.*/
-    struct header vh;
+    /*struct header vh;
     struct infoHeader vih;
     struct joc2FileHeader vjoh;
     struct header* h = &vh;
     struct infoHeader* ih = &vih;
     struct joc2FileHeader* joh = &vjoh;
-    struct bufferRGB bf;
-    struct bufferRGB* bRGB = &bf;
 
     char* bitstream;
     char* bufferImg;
@@ -281,7 +267,7 @@ void joc22bmp( char* joc2in, char* bmpout ){
         j=+8;
     }
 
-}
+}*/
 
 char* readbmp( char* bmpin, header* h, infoHeader* ih ){
 
@@ -428,7 +414,7 @@ char* readjoc2( char* joc2in, header* h, infoHeader* ih, joc2FileHeader* joh){
 
                 if( esJoc2( joh ) )
                 {
-                    /*transformo el tamaño que esta en Bytes a bits*/
+                    /*transformo el tamaï¿½o que esta en Bytes a bits*/
 
                     tamBits = joh->bSize;
 
@@ -527,7 +513,7 @@ void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, c
 
 int esBmp( header* h ){
 
-    int res;
+    //int res;
     char* t;
 
     t = h->bfType;
@@ -565,10 +551,3 @@ long int ancho(infoHeader* h ){
 long long int tamImgJoc2( joc2FileHeader* h ){
     return h->bSize;
 }
-
-
-
-
-
-
-

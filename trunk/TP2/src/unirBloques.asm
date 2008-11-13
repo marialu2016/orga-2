@@ -36,43 +36,53 @@ ubicar_i:
 	;Copio bloque en i,j
 	mov ebx, ancho	
 	mov esi, bloque
-	mov al, [esi]
-	mov byte[edi], al
-	lea esi, [esi+1]
+
+	mov eax, [esi]
+	mov [edi], eax
+	mov eax, [esi + 4]
+	mov [edi + 4], eax
 	lea edi, [edi+ebx]
 
-	mov al, [esi]
-	mov byte[edi], al
-	lea esi, [esi+1]
+	mov eax, [esi]
+	mov [edi], eax
+	mov eax, [esi + 4]
+	mov [edi + 4], eax
 	lea edi, [edi+ebx]
 
-	mov al, [esi]
-	mov byte[edi], al
-	lea esi, [esi+1]
+	mov eax, [esi]
+	mov [edi], eax
+	mov eax, [esi + 4]
+	mov [edi + 4], eax
 	lea edi, [edi+ebx]
 
-	mov al, [esi]
-	mov byte[edi], al
-	lea esi, [esi+1]
+	mov eax, [esi]
+	mov [edi], eax
+	mov eax, [esi + 4]
+	mov [edi + 4], eax
 	lea edi, [edi+ebx]
 
-	mov al, [esi]
-	mov byte[edi], al
-	lea esi, [esi+1]
+	mov eax, [esi]
+	mov [edi], eax
+	mov eax, [esi + 4]
+	mov [edi + 4], eax
 	lea edi, [edi+ebx]
 
-	mov al, [esi]
-	mov byte[edi], al
-	lea esi, [esi+1]
+	mov eax, [esi]
+	mov [edi], eax
+	mov eax, [esi + 4]
+	mov [edi + 4], eax
 	lea edi, [edi+ebx]
 
-	mov al, [esi]
-	mov byte[edi], al
-	lea esi, [esi+1]
+	mov eax, [esi]
+	mov [edi], eax
+	mov eax, [esi + 4]
+	mov [edi + 4], eax
 	lea edi, [edi+ebx]
 
-	mov al, [esi]
-	mov byte[edi], al
+	mov eax, [esi]
+	mov [edi], eax
+	mov eax, [esi + 4]
+	mov [edi + 4], eax
 
 
 fin:
