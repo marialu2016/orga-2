@@ -37,7 +37,7 @@ typedef struct joc2FileHeader{
     char fType[4]; //es el string "JOC2"
     int bSize; //tamano en bits del bitstream
 
-}joc2FileHeader;
+} joc2FileHeader;
 
 /************************************************************************************
 **                              Funciones en C                                     **
@@ -45,6 +45,7 @@ typedef struct joc2FileHeader{
 
 void bmp2joc2( char* bmpin, char* joc2out );
 void joc22bmp( char* joc2in, char* bmpout );
+int* generarQ();
 char* readbmp( char* bmpin, header* h, infoHeader* ih );
 void writebmp( char* bmpout, header* h, infoHeader* ih, char* bufferImg );
 char* readjoc2( char* joc2in, header* h, infoHeader* ih, joc2FileHeader* joh);
@@ -54,16 +55,16 @@ void writejoc2( char* BufferjOc2, header* h, infoHeader* ih, joc2FileHeader* joh
 **                              Funciones en Assembler                             **
 ************************************************************************************/
 
-extern char* dividirEnBloques( char* imgCanal, int coord_i, int coord_j, int ancho );
+extern char* dividirBloques( char* imgCanal, int coord_i, int coord_j, int ancho );
 extern float* generarDCT();
-extern float* transpuesta( float* matriz );
+extern float* traspuesta( float* matriz );
 extern void transformar( float* bloqueDe8x8, float* DCT );
-/*extern*/ short int* cuantizar( float* bloqueTransf );
-/*extern*/ char* codificar( short int* bloqueCuant );
-/*extern*/ short int* decodificar( char* bitstream, char* ptr );
-/*extern*/ float* decuantizar( short int* bloqueCuant );
-/*extern*/ char* antiTransformar( float* bloqueTransf );
-/*extern*/ char* unirBloques( char* bufferCanal, char* bloque, short int coord_i, short int coord_j );
+extern short int* cuantizar( float* bloqueTransf, int* q);
+extern char* codificar( short int* bloqueCuant, int* tam );
+extern short int* decodificar( char* bitstream, int* offset );
+extern float* decuantizar( short int* bloqueCuant, int* q );
+extern float* antiTransformar( float* bloqueTransf, float* DCT );
+extern char* unirBloques( char* bufferCanal, char* bloque, int coord_i, int coord_j, int ancho );
 
 /************************************************************************************
 **                     Funciones para el encabezado del BMP y OC2                  **
@@ -72,7 +73,7 @@ extern void transformar( float* bloqueDe8x8, float* DCT );
 int esBmp( header* h );
 long int tamFile( header* h );
 long int tamImg( infoHeader* h );
-int es24 ( infoHeader* h );
+int es24( infoHeader* h );
 int esJoc2( joc2FileHeader* h );
 long int aquiEmpieza( header* h );
 long int ancho(infoHeader* h);
@@ -85,15 +86,7 @@ long long int tamImgJoc2( joc2FileHeader* h);
 
 int main()
 {
-    char* bmpin = "test.bmp";
-    char* joc2out = "test.joc2";
-    char* joc2in = "test.joc2";
-    char* bmpout = "test2.bmp";
-
-    bmp2joc2( bmpin, joc2out );
-    joc22bmp( joc2in, bmpout );
-
-    printf("vuelva prontos!\n");
+    printf("Hello world!\n");
     return 0;
 }
 
@@ -103,45 +96,109 @@ int main()
 
 void bmp2joc2( char* bmpin, char* joc2out ){
 
+    /*bmp2joc2: programa principal para comprimir.*/
+
     struct header vh;
     struct infoHeader vih;
-    struct Oc2FileHeader voh;
+    struct joc2FileHeader vjoh;
     struct header* h = &vh;
     struct infoHeader* ih = &vih;
-    struct Oc2FileHeader* oh = &voh;
+    struct joc2FileHeader* joh = &vjoh;
+    struct bufferRGB bf;
+    struct bufferRGB* bRGB = &bf;
 
     char* bufferImg;
-    float* B;
-    float* DCT;
-    short int* mCuantizada;
-    int trash;
+    char* bufferJoc2;
+    char* bR = NULL;
+    char* bG = NULL;
+    char* bB = NULL;
 
-    oh->fType[0] = 'J';
-    oh->fType[1] = 'O';
-    oh->fType[2] = 'C';
-    oh->fType[3] = '2';
+    char* bloque;
+    char* matriz;
+    short int* mcuant;
+    float* DCT = NULL;
+    int* Q;
+
+    long int i, j;
+    int tam = 0;
+    int* ptr_tam = &tam;
 
     bufferImg = readbmp( bmpin, h, ih );
 
-    trash = (ih->biWidth) % 4;
+    bR = malloc( (ih->biWidth)*(ih->biHeight) );
+    bG = malloc( (ih->biWidth)*(ih->biHeight) );
+    bB = malloc( (ih->biWidth)*(ih->biHeight) );
 
-    DCT = generarDCT();
-
-    while(  )
+    for( i = 0; i < ih->biWidth; i++ )
     {
-        B = dividirBloques();
-        transformar( B, DCT );
-        mCuantizada = cuantizar(  ):
-        codificar( );
+        for(j = 0; j < ih->biHeight; j++)
+        {
+            if( (j % 3) == 0 )
+            {
+                bR[i][j] = bufferImg[i][j];
+            }
+            else
+            {
+                if( (j % 3) == 1 )
+                {
+                    bG[i][j] = bufferImg[i][j];
+                }
+                else
+                {
+                    bB[i][j] = bufferImg[i][j];
+                }
+            }
+        }
     }
 
-    oh->bSize = 0;
+    joh->fType[0] = 'J';
+    joh->fType[1] = 'O';
+    joh->fType[2] = 'C';
+    joh->fType[3] = '2';
 
-    writeoc2( oc2out, h, ih, oh, bufferOc2, tamBitsBytes );
+    DCT = generarDCT();
+    Q = generarQ();
+
+    for( i = 0; i <  (ih->biWidth * 3); i+= 8 )
+    {
+        for( j = 0; j <  (ih->biWidth * 3); j+= 8 )
+        {
+            bloque = dividirBloques( bR, i, j, ih->biWidth);
+            matriz = transformar( bloque , DCT );
+            mcuant = cuantizar( matriz, Q );
+            bufferJoc2  = codificar( mcuant, ptr_tam );
+        }
+        bitstreamR
+    }
+
+    for( i = 0; i <  (ih->biWidth * 3); i+= 8 )
+    {
+        for( j = 0; j <  (ih->biWidth * 3); j+= 8 )
+        {
+            bloque = dividirBloques( bG, i, j, ih->biWidth );
+            matriz = transformar( bloque , DCT );
+            mcuant = cuantizar( matriz, Q );
+            bufferJoc2  = codificar( mcuant, ptr_tam );
+        }
+    }
+
+    for( i = 0; i <  (ih->biWidth * 3); i+= 8 )
+    {
+        for( j = 0; j <  (ih->biWidth * 3); j+= 8 )
+        {
+            bloque = dividirBloques( bB, i, j, ih->biWidth );
+            matriz = transformar( bloque , DCT );
+            mcuant = cuantizar( matriz, Q );
+            bufferJoc2  = codificar( mcuant, ptr_tam );
+        }
+    }
+
+    writejoc2(joc2out, h,  ih, joh, rR, bG, bB);
+
 }
 
 void joc22bmp( char* joc2in, char* bmpout ){
-
+    /*joc22bmp: programa principal para descomprimir.*/
 }
 
 char* readbmp( char* bmpin, header* h, infoHeader* ih ){
@@ -309,7 +366,26 @@ char* readjoc2( char* joc2in, header* h, infoHeader* ih, joc2FileHeader* joh){
 
 }
 
-void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, char* bitstream, int tamBits ){
+int* generarQ(){
+
+    int* Q = NULL;
+
+    Q = malloc(4*64);
+
+    Q[1] = 16; Q[2] = 11; Q[3] = 10; Q[4] = 16; Q[5] = 24; Q[6] = 40; Q[7] = 51; Q[8] = 61;
+    Q[9] = 12; Q[10] = 12; Q[11] = 14; Q[12] = 29; Q[13] = 26; Q[14] = 58; Q[15] = 50; Q[16] = 55;
+    Q[17] = 14; Q[18] = 13; Q[19] = 16; Q[20] = 24; Q[21] = 40; Q[22] = 57; Q[23] = 69; Q[24] = 56;
+    Q[25] = 14; Q[26] = 17; Q[27] = 22; Q[28] = 29; Q[29] = 51; Q[30] = 87; Q[31] = 80; Q[32] = 62;
+    Q[33] = 18; Q[34] = 22; Q[35] = 37; Q[36] = 56; Q[37] = 68; Q[38] = 109; Q[39] = 103; Q[40] = 77;
+    Q[41] = 24; Q[42] = 35; Q[43] = 55; Q[44] = 64; Q[45] = 81; Q[46] = 104; Q[47] = 113; Q[48] = 92;
+    Q[49] = 49; Q[50] = 64; Q[51] = 78; Q[52] = 87; Q[53] = 103; Q[54] = 121; Q[55] = 120; Q[56] = 101;
+    Q[57] = 72; Q[58] = 92; Q[59] = 95; Q[60] = 98; Q[61] = 112; Q[62] = 100; Q[63] = 103; Q[64] = 99;
+
+    return Q;
+}
+
+void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, char* bR, char* bG, char* bB )
+{
 
     /*writejoc2: escribe el header del .joc2, el header y el infoHeader del .bmp y copia el bitstream
     comprimido que esta en el buffer en el archivo .joc2*/
@@ -405,3 +481,10 @@ long int ancho(infoHeader* h ){
 long long int tamImgJoc2( joc2FileHeader* h ){
     return h->bSize;
 }
+
+
+
+
+
+
+
