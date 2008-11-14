@@ -58,12 +58,12 @@ void writejoc2( char* BufferjOc2, header* h, infoHeader* ih, joc2FileHeader* joh
 extern float* dividirBloques( char* imgCanal, int coord_i, int coord_j, int ancho );
 extern float* generarDCT();
 extern float* traspuesta( float* matriz );
-extern void transformar( float* bloqueDe8x8, float* DCT );
+extern float* transformar( char* bloqueDe8x8, float* DCT );
 extern short int* cuantizar( float* bloqueTransf, int* q);
 extern char* codificar( short int* bloqueCuant, int* tam );
 extern short int* decodificar( char* bitstream, int* offset );
 extern float* decuantizar( short int* bloqueCuant, int* q );
-extern void antiTransformar( float* bloqueTransf, float* DCT );
+extern char* antiTransformar( float* bloqueTransf, float* DCT );
 extern void unirBloques( char* bufferCanal, char* bloque, int coord_i, int coord_j, int ancho );
 
 /************************************************************************************
@@ -129,7 +129,8 @@ void bmp2joc2( char* bmpin, char* joc2out )
     char* ptr_G;
     char* ptr_B;
 
-    float* bloque;
+    char* bloque;
+    float bloque_trans;
     short int* mcuant;
     float* DCT = NULL;
     int* Q;
@@ -175,51 +176,53 @@ void bmp2joc2( char* bmpin, char* joc2out )
     {
         for( j = 0; j <  ih->biHeight; j+= 8 )
         {
+            /*compresion del bloque correspondiente al canal rojo*/
             bloque = dividirBloques( bR, i, j, ih->biWidth);
-            transformar( bloque , DCT );
-            mcuant = cuantizar( bloque, Q );
+            bloque_trans = transformar( bloque , DCT );
+            mcuant = cuantizar( bloque_trans, Q );
             bufferJoc2  = codificar( mcuant, &tam );
             tamBufferR = tamBufferR + tam;
             memcpy( ptr_R, bufferJoc2, tam );
             ptr_R = ptr_R + tam;
-        }
-    }
-
-    for( i = 0; i <  ih->biWidth ; i+= 8 )
-    {
-        for( j = 0; j <  ih->biHeight; j+= 8 )
-        {
+            free(bloque);
+            free(bloque_trans);
+            free(mcuant);
+            free(bufferJoc2);
+            /*compresion del bloque correspondiente al canal verde*/
             bloque = dividirBloques( bG, i, j, ih->biWidth );
-            transformar( bloque , DCT );
-            mcuant = cuantizar( bloque, Q );
+            bloque_trans = transformar( bloque , DCT );
+            mcuant = cuantizar( bloque_trans, Q );
             bufferJoc2  = codificar( mcuant, &tam );
             tamBufferG = tamBufferG + tam;
             memcpy( ptr_G, bufferJoc2, tam );
             ptr_G = ptr_G + tam;
-        }
-    }
-
-    for( i = 0; i <  ih->biWidth; i+= 8 )
-    {
-        for( j = 0; j <  ih->biHeight; j+= 8 )
-        {
+            free(bloque);
+            free(bloque_trans);
+            free(mcuant);
+            free(bufferJoc2);
+            /*compresion del bloque correspondiente al canal azul*/
             bloque = dividirBloques( bB, i, j, ih->biWidth );
-            transformar( bloque , DCT );
-            mcuant = cuantizar( bloque, Q );
+            bloque_trans = transformar( bloque , DCT );
+            mcuant = cuantizar( bloque_trans, Q );
             bufferJoc2  = codificar( mcuant, &tam );
             tamBufferB = tamBufferB + tam;
             memcpy( ptr_B, bufferJoc2, tam );
             ptr_B = ptr_B + tam;
+            free(bloque);
+            free(bloque_trans);
+            free(mcuant);
+            free(bufferJoc2);
         }
     }
+
     joh->bSize = tamBufferR + tamBufferG + tamBufferB;
     writejoc2(joc2out, h,  ih, joh, bitstreamR, bitstreamG,bitstreamB, tamBufferR, tamBufferG, tamBufferB);
 
 }
 
-/*void joc22bmp( char* joc2in, char* bmpout ){*/
+void joc22bmp( char* joc2in, char* bmpout ){
     /*joc22bmp: programa principal para descomprimir.*/
-    /*struct header vh;
+    struct header vh;
     struct infoHeader vih;
     struct joc2FileHeader vjoh;
     struct header* h = &vh;
@@ -242,7 +245,7 @@ void bmp2joc2( char* bmpin, char* joc2out )
     char* ptr_B;
 
     char* bloque;
-    char* matriz;
+    char* bloque_trans;
     short int* mcuant;
     float* DCT = NULL;
     int* Q;
@@ -256,18 +259,54 @@ void bmp2joc2( char* bmpin, char* joc2out )
     DCT = generarDCT();
     Q = generarQ();
 
-    i = j = 0;
-    while( offset < joh->bSize )
+    for( i = 0; i < ih->biWidth; i=+8 )
     {
-        mcuant = decodificar( bitstream, &offset);
-        bloque = descuantizar( mcuant, Q );
-        antitransformar( bloque, DCT );
-        unirBloques( canal, bloque, i, j, ih->biWidth );
-        i=+8;
-        j=+8;
+        for( j = 0; j < ih->biHeight; j=+8 )
+        {
+            mcuant = decodificar( bitstream, &offset);
+            bloque_trans = descuantizar( mcuant, Q );
+            bloque = antitransformar( bloque, DCT );
+            unirBloques( bR, bloque, i, j, ih->biWidth );
+        }
     }
 
-}*/
+    for( i = 0; i < ih->biWidth; i=+8 )
+    {
+        for( j = 0; j < ih->biHeight; j=+8 )
+        {
+            mcuant = decodificar( bitstream, &offset);
+            bloque_trans = descuantizar( mcuant, Q );
+            bloque = antitransformar( bloque, DCT );
+            unirBloques( bG, bloque, i, j, ih->biWidth );
+        }
+    }
+
+    for( i = 0; i < ih->biWidth; i=+8 )
+    {
+        for( j = 0; j < ih->biHeight; j=+8 )
+        {
+            mcuant = decodificar( bitstream, &offset);
+            bloque_trans = descuantizar( mcuant, Q );
+            bloque = antitransformar( bloque, DCT );
+            unirBloques( bB, bloque, i, j, ih->biWidth );
+        }
+    }
+
+    for( i = 0; i < ih->biSizeImage; i++ )
+    {
+	    k = i/3;
+	    bufferImg[i] = bR[k];
+	    i++;
+	    k = i/3;
+        bufferImg[i] = bG[k];
+	    i++;
+	    k = i/3;
+        bufferImg[i] = bB[k];
+    }
+
+    writebmp( bmpout,h,ih,bufferImg);
+
+}
 
 char* readbmp( char* bmpin, header* h, infoHeader* ih ){
 
