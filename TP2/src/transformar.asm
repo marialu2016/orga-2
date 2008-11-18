@@ -1,15 +1,78 @@
 global transformar
 
-extern transpuesta
 extern malloc
-extern free
 
 section .text
 
-%define dct [ebp + 8]
-%define b [ebp + 12]
+%define b [ebp + 8]
+%define dct [ebp + 12]
 
 %define resultado [ebp - 4]
+
+%macro cargarYconvertir 0
+
+    movq xmm1, [edi];8 elementos de un byte cada uno(toda una fila)
+    movq xmm2, [edi];8 elementos de un byte cada uno(toda una fila)
+    lea edi, [edi + 8]
+    pxor xmm0, xmm0
+    punpcklbw xmm1, xmm0; transforma los numeros que estan en bytes a word
+    punpcklbw xmm2, xmm0; transforma los numeros que estan en bytes a word
+    punpcklwd xmm1, xmm0; transforma los numeros que estan en word a dword(parte alta)
+    punpckhwd xmm2, xmm0; transforma los numeros que estan en word a dword(parte baja)
+    cvtdq2ps xmm1, xmm1; convierte los 4 enteros dword a float
+    cvtdq2ps xmm2, xmm2; convierte los 4 enteros dword a float
+    ;xmm1 tiene los primeros 4 numeros de la fila
+    ;xmm2 tiene los segundos 4 numeros de la fila
+    ; entre xmm1 y xmm2 tengo toda la fila
+
+%endmacro
+
+%macro cargar 1
+
+    movups xmm3, [%1];cargo la primera parte de la fila
+    lea %1, [%1 + 16]
+    movups xmm4, [%1];cargo la segunda parte de la fila
+    lea %1, [%1 + 16]
+
+%endmacro
+
+
+%macro cargar2 1
+
+    movups xmm1, [%1];cargo la primera parte de la fila
+    lea %1, [%1 + 16]
+    movups xmm2, [%1];cargo la segunda parte de la fila
+    lea %1, [%1 + 16]
+
+%endmacro
+
+%macro mult1 0
+
+    mulps xmm3, xmm1
+    mulps xmm4, xmm2
+    addps xmm3, xmm4
+    pshufd xmm4, xmm3, 00001011b
+    addps xmm3, xmm4
+    shufps xmm4, xmm3, 00000001b
+    addps xmm3, xmm4
+    movss [eax], xmm3
+    lea eax, [eax + 4]
+
+%endmacro
+
+%macro mult2 0
+
+    mulps xmm1, xmm3
+    mulps xmm2, xmm4
+    addps xmm1, xmm2
+    pshufd xmm2, xmm1, 00001011b
+    addps xmm1, xmm2
+    shufps xmm2, xmm1, 00000001b
+    addps xmm1, xmm2
+    movss [eax], xmm1
+    lea eax, [eax + 4]
+
+%endmacro
 
 transformar:
     push ebp
@@ -27,112 +90,304 @@ transformar:
 
     mov esi, dct
     mov edi, b
-    mov ecx, 8
-    mov edx, 8
-    xor ebx, ebx
 
-cicloCol:
-    cmp ecx, 0
-    je mult1
 
-    movups xmm1, [esi]
-    movups xmm2, [esi + 16]
-    movups xmm3, [edi + ebx]
-    add ebx, 16
-    movups xmm4, [edi + ebx]
-    add ebx, 16
-    mulps xmm3, xmm1
-    mulps xmm4, xmm2
-    addps xmm3, xmm4
-    shufps xmm4, xmm3, 10110000b
-    addps xmm3, xmm4
-    shufps xmm4, xmm3, 01000000b
-    addps xmm3, xmm4
-    movss [eax], xmm3
-    lea eax, [eax + 4]
+    cargarYconvertir
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
 
-    movups xmm5, [edi + ebx]
-    add ebx, 16
-    movups xmm6, [edi + ebx]
-    add ebx, 16
-    mulps xmm5, xmm1
-    mulps xmm6, xmm2
-    addps xmm5, xmm6
-    shufps xmm6, xmm5, 10110000b
-    addps xmm5, xmm6
-    shufps xmm6, xmm5, 01000000b
-    addps xmm5, xmm6
-    movss [eax], xmm5
-    lea eax, [eax + 4]
+    cargarYconvertir
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1  
 
-    sub ecx, 2
+    cargarYconvertir
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1  
 
-mult1:
-    cmp edx, 0
-    je seguir
-    dec edx
-    lea esi, [esi + 32]
-    xor ebx, ebx
-    jmp cicloCol
+    cargarYconvertir
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1  
 
-seguir:
+    cargarYconvertir
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1  
+
+    cargarYconvertir
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1  
+
+    cargarYconvertir
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1  
+
+    cargarYconvertir
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1
+    cargar esi
+    mult1  
+
+    ;hasta aca tenemos DCT.transpuesta(B) apuntada por la variable resultado
+
     mov esi, resultado
-    mov edi, dct
-    mov eax, b
-    mov ecx, 8
-    mov edx,8
+    mov edi, dct 
+    mov eax, resultado
 
-cicloCol2:
-    cmp ecx, 0
-    je mult2
+    cargar esi
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
 
-    movups xmm1, [esi]
-    movups xmm2, [esi + 16]
-    movups xmm3, [edi + ebx]
-    add ebx, 16
-    movups xmm4, [edi + ebx]
-    add ebx, 16
-    mulps xmm3, xmm1
-    mulps xmm4, xmm2
-    addps xmm3, xmm4
-    shufps xmm4, xmm3, 10110000b
-    addps xmm3, xmm4
-    shufps xmm4, xmm3, 01000000b
-    addps xmm3, xmm4
-    movss [eax], xmm3
-    lea eax, [eax + 4]
+    cargar esi
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
 
-    movups xmm5, [edi + ebx]
-    add ebx, 16
-    movups xmm6, [edi + ebx]
-    add ebx, 16
-    mulps xmm5, xmm1
-    mulps xmm6, xmm2
-    addps xmm5, xmm6
-    shufps xmm6, xmm5, 10110000b
-    addps xmm5, xmm6
-    shufps xmm6, xmm5, 01000000b
-    addps xmm5, xmm6
-    movss [eax], xmm5
-    lea eax, [eax + 4]
+    cargar esi
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
 
-    sub ecx, 2
+    cargar esi
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
 
-mult2:
-    cmp edx, 0
-    je terminar
-    dec edx
-    lea esi, [esi + 32]
-    xor ebx, ebx
-    jmp cicloCol2
+    cargar esi
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
 
-terminar:
-	mov eax, resultado
-	;push eax
-	;call free
-        ;add esp, 4
-    
+    cargar esi
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+
+    cargar esi
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+
+    cargar esi
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+    cargar2 edi
+    mult2
+
 fin:
+    mov eax, resultado
     pop ebx
     pop esi
     pop edi

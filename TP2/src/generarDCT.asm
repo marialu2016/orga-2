@@ -2,11 +2,14 @@ global generarDCT
 
 extern malloc
 
+%define const [ebp - 4]
+
 section .text
 
 generarDCT:
     push ebp
     mov ebp, esp
+    sub esp, 4
     push edi
     push esi
     push ebx
@@ -20,6 +23,7 @@ generarDCT:
     mov ebx, eax
     mov ecx, 8
     mov edx, 8
+    mov dword const, 180
     finit
     fld1
     fld1
@@ -34,76 +38,66 @@ generarDCT:
     fsqrt
     fstp st2 ;st(0)=raiz(1/8), st(1)=raiz(2/8)
 
-    fldz
-    fldz
+    fldz ; i = 0
+    fldz ; j = 0
+
 cicloCol:
-;     fld1
-;     fadd st0, st1;st0 = 9 y st1 = 8
-;     fcomp st1
-;     fstsw ax
-;     sahf
-;     ja cicloFila
-;     fldz
-;     fcomp st2
-;     fstsw ax
-;     sahf
     cmp ecx, 0
     je cicloFila
     dec ecx
+
     cmp edx, 8
     je i_cero
+
+    fld1
+    fadd st0, st0; st0 = 2
+    fmul st0, st1; st0 = 2*j
+    fld1
+    faddp st1, st0; st0 = (2*j+1)
+    fmul st0, st2; st0 = (2*j+1)*i
+    fldpi
+    fmulp st1, st0;st0 = (2*j+1)*i*pi
     fld1
     fadd st0, st0
-    fmul st0, st1
-    fld1
-    faddp st1, st0
-    fmul st0, st2
+    fadd st0, st0
+    fadd st0, st0
+    fadd st0, st0; st0 = 16
+    fdivp st1, st0;st0 = ((2*j+1)*i*pi)/16
     fldpi
     fmulp st1, st0
-    fld1
-    fadd st0, st0
-    fadd st0, st0
-    fadd st0, st0
-    fadd st0, st0
+    fild dword const
     fdivp st1, st0
-    fcos
-    fmul st0, st4
+    fcos; st0 = cos(((2*j+1)*i*pi)/16)
+    fmul st0, st4; st0 = 1/2 * cos(((2*j+1)*i*pi)/16)
     jmp guardar
 i_cero:
     fld st2
 guardar:
-    fstp dword [edi]
-    lea edi, [edi + 4]
+     fstp dword [edi]
+     lea edi, [edi + 4]
      fld1
-     faddp st1, st0
-    jmp cicloCol
+     faddp st1, st0; st0 = j + 1
+     jmp cicloCol
 cicloFila:
       fld1
-      faddp st2, st0
-;     fld1
-;     fadd st0, st0
-;     fadd st0, st0
-;     fadd st0, st0
-;     fld1
-;     fadd st0, st1
-;     fcomp st1
-;     fstsw ax
-;     sahf
-;     ja fin
-    cmp edx, 0
-    je fin
-    dec edx
-    mov ecx, 8
-     fld1
-     fadd st0, st0
-     fadd st0, st0
-     fadd st0, st0
-     fsubrp st1, st0
-    jmp cicloCol
+      faddp st2, st0 ; st1 = i + 1
+
+      cmp edx, 0
+      je fin
+      dec edx
+
+      mov ecx, 8
+      fld1
+      fadd st0, st0
+      fadd st0, st0
+      fadd st0, st0; st0 = 8
+      fsubp st1, st0; st1 = st1 - 8
+      jmp cicloCol
 fin:
     mov eax, ebx
     pop ebx
     pop esi
     pop edi
+    add esp, 4
     pop ebp
     ret
