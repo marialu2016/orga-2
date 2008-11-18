@@ -24,19 +24,22 @@ transpuesta:
     mov eax, 256
     push eax
     call malloc
+    add esp, 4
 
     mov resultado, eax
     mov edi, eax
     mov ecx, 8
     mov edx, 8
+
 cicloCol:
     cmp edx, 0
     je cicloFila
     mov eax, 8
-    sub eax, edx
-    shl eax, 2
-    mov ebx, [esi +  eax]
-    shl eax, 3
+    sub eax, edx; eax = en que columna estoy
+    shl eax, 2 ; lo multiplico por 4 porque es el tama�o de los datos
+    mov ebx, [esi +  eax] ;ebx = valor de la columna
+    shr eax, 2
+    shl eax, 5
     mov desp, eax
     mov eax, 8
     sub eax, ecx
@@ -47,7 +50,7 @@ cicloCol:
     jmp cicloCol
 
 cicloFila:
-    cmp ecx, 0
+    cmp ecx, 1
     je fin
     dec ecx
     mov edx, 8
