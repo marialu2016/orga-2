@@ -55,7 +55,7 @@ void writejoc2( char* BufferjOc2, header* h, infoHeader* ih, joc2FileHeader* joh
 **                              Funciones en Assembler                             **
 ************************************************************************************/
 
-extern float* dividirBloques( char* imgCanal, int coord_i, int coord_j, int ancho );
+extern char* dividirBloques( char* imgCanal, int coord_i, int coord_j, int ancho );
 extern float* generarDCT();
 extern float* traspuesta( float* matriz );
 extern float* transformar( char* bloqueDe8x8, float* DCT );
