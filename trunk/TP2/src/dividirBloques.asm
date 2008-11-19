@@ -23,7 +23,6 @@ dividirBloques:
     mov esi, canal
 
     mov eax, 64
-    shl eax, 2
     push eax
     call malloc
     add esp, 4
@@ -34,10 +33,14 @@ dividirBloques:
     mov ecx, i
 
 ubicar_i:
+	cmp ecx ,0
+	je seguir
 	lea edi, [edi+eax]
-	loop ubicar_i
+	dec ecx
+	jmp ubicar_i
 
 ;Ubico en la coordenada j
+seguir:
 	xor eax, eax
 	mov eax, j
 	lea esi, [esi+eax]
@@ -46,46 +49,54 @@ ubicar_i:
 	mov ebx, prox_fila	
 	mov edi, resultado
 
+
 	mov eax, [esi]
 	mov [edi], eax
 	mov eax, [esi + 4]
 	mov [edi + 4], eax
+	lea edi, [edi + 8]
 	lea esi, [esi+ebx]
 
 	mov eax, [esi]
 	mov [edi], eax
 	mov eax, [esi + 4]
 	mov [edi + 4], eax
+	lea edi, [edi + 8]
 	lea esi, [esi+ebx]
 
 	mov eax, [esi]
 	mov [edi], eax
 	mov eax, [esi + 4]
 	mov [edi + 4], eax
+	lea edi, [edi + 8]
 	lea esi, [esi+ebx]
 
 	mov eax, [esi]
 	mov [edi], eax
 	mov eax, [esi + 4]
 	mov [edi + 4], eax
+	lea edi, [edi + 8]
 	lea esi, [esi+ebx]
 
 	mov eax, [esi]
 	mov [edi], eax
 	mov eax, [esi + 4]
 	mov [edi + 4], eax
+	lea edi, [edi + 8]
 	lea esi, [esi+ebx]
 
 	mov eax, [esi]
 	mov [edi], eax
 	mov eax, [esi + 4]
 	mov [edi + 4], eax
+	lea edi, [edi + 8]
 	lea esi, [esi+ebx]
 
 	mov eax, [esi]
 	mov [edi], eax
 	mov eax, [esi + 4]
 	mov [edi + 4], eax
+	lea edi, [edi + 8]
 	lea esi, [esi+ebx]
 
 	mov eax, [esi]
