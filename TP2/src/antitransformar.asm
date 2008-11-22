@@ -1,4 +1,4 @@
-global antitransformar
+global antiTransformar
 
 extern transpuesta
 extern malloc
@@ -11,7 +11,7 @@ section .text
 
 %define resultado [ebp - 4]
 
-antitransformar:
+antiTransformar:
     push ebp
     mov ebp, esp
     sub esp, 4
