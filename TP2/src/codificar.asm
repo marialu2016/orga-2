@@ -11,11 +11,12 @@ section .text
 %define resultado [ebp - 4]
 %define ceros [ebp - 8]
 %define memapedir [ebp - 12]
+%define n_col [ebp - 16]
 
 codificar:
     push ebp
     mov ebp, esp
-    sub esp, 12
+    sub esp, 16
     push edi
     push esi
     push ebx
@@ -23,21 +24,24 @@ codificar:
     mov eax, 129
     push eax
     call malloc
+    add esp, 4
 
-    mov edi, eax
+    mov edi, eax ;pre-bitstream
     mov resultado, eax
-    mov esi, bq
-    xor eax, eax
-    xor ebx, ebx
-    xor ecx, ecx
-    xor edx, edx
-
-    mov dx, [esi]
-    mov [edi], dx
-    add ebx, 2
-    lea edi, [edi + 2]
+    mov esi, bq ;matriz cuantizada
+    xor eax, eax ;lo uso para redireccionarme
+    xor ebx, ebx ;contador de que diagonal estoy
+    xor ecx, ecx ;contador filas 
+    xor edx, edx ; contador columnas y para guardar el elemento
+    mov dword memapedir, 0
+    
+    mov dl, [esi] ;primer elemento
+    mov [edi], dl ;copio primer elemento al bitstream
+    ;add ebx, 2 
+    lea edi, [edi + 1]
+    add dword memapedir, 1
     add eax, 1
-    mov ecx, eax
+    ;mov ecx, eax
     mov byte ceros, 0
 
     mov ebx, 1
@@ -63,33 +67,34 @@ preDiagAb:
 post_ciclo:
     shr ebx,1
     jc preDiagAb2
+    shl ebx, 1
     mov edx, ebx
     sub edx, 7
-    mov ecx, ebx
-    sub ecx, edx
+    mov ecx, 7
     jmp diagArriba
 preDiagAb2:
+    shl ebx,1
+    add ebx,1
     mov ecx, ebx
     sub ecx, 7
-    mov edx, ebx
-    sub edx, ecx
+    mov edx, 7
 
 diagAbajo:
     mov eax, edx
-    shl edx, 1
+    shl eax, 1
     shl ecx, 4
     add eax, ecx
     shr ecx, 4
     jmp genio
 termine:
-    jmp fin
+    jmp reservar
 seguir:
-    inc ecx
-    dec edx
-    add ecx, edx
-    cmp ebx, ecx
-    ja ciclar
-    sub ecx, edx
+    inc ecx ; me posiciono en la siguiente fila 
+    dec edx ; me posiciono en la anterior columna
+    ;add ecx, edx ; fila + columna 
+    cmp ebx, ecx ; fila + columna <= diagActual
+    jb ciclar
+    ;sub ecx, edx
     cmp ecx, 7
     ja ciclar
     mov eax, ecx
@@ -101,19 +106,21 @@ seguir:
 ciclar:
     xor ecx, ecx
     xor edx, edx
-    inc ebx
+    inc ebx ; incremento la columna actual
     jmp ciclo
 genio:
     cmp word [esi + eax], 0
     je aumCeros
-
+    
+    mov n_col, edx
     mov dl, ceros
     mov [edi], dl
-    mov dx , [esi + ebx]
-    mov [edi + 1], dx
+    mov dl , [esi + eax]
+    mov [edi + 1], dl
     lea edi, [edi + 2]
-    add dword memapedir, 1
+    add dword memapedir, 2
     mov byte ceros, 0
+    mov edx, n_col
     jmp seguir
 aumCeros:
     add byte ceros, 1
@@ -129,12 +136,12 @@ diagArriba:
 seguir2:
     inc edx
     dec ecx
-    add ecx, edx
-    cmp ebx, ecx
-    ja ciclar2
-    sub ecx, edx
+    ;add ecx, edx
+    cmp ebx, edx
+    jb ciclar2
+    ;sub ecx, edx
     cmp edx, 7
-    ja ciclar
+    ja ciclar2
     mov eax, ecx
     shl eax, 4
     shl edx, 1
@@ -150,13 +157,15 @@ genio2:
     cmp word [esi + eax], 0
     je aumCeros2
 
+    mov n_col, edx
     mov dl, ceros
     mov [edi], dl
-    mov dx , [esi + ebx]
-    mov [edi + 1], dx
+    mov dl , [esi + eax]
+    mov [edi + 1], dl
     lea edi, [edi + 2]
-    add dword memapedir, 1
+    add dword memapedir, 2
     mov byte ceros, 0
+    mov edx, n_col
     jmp seguir2
 aumCeros2:
     add byte ceros, 1
@@ -167,12 +176,13 @@ reservar:
     push eax
     call malloc
     add esp, 4
-    
+
     mov edi, eax
     mov esi, resultado
     mov ecx, memapedir
+    mov edx, tam
+    mov [edx], ecx
     xor edx, edx
-    mov tam, ecx
 
 copiar:
     mov dl, [esi]
@@ -192,6 +202,6 @@ fin:
     pop ebx
     pop esi
     pop edi
-    add esp, 12
+    add esp, 16
     pop ebp
     ret
