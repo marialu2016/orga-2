@@ -8,17 +8,32 @@ section .text
 %define q [ebp + 12]
 %define res [ebp - 4]
 
-%macro dividir 0
-    movups xmm0, [esi + ebx]
-    movups xmm2, [edi + ebx]
-    add ebx, 16
+%macro cargar 0
+    movq xmm0, [esi + edx]
+    add edx, 8
+    movq xmm4, [esi + edx]
+    add edx, 8
+    pshufd xmm0, xmm0, 01001111b
+    addd xmm0, xmm4
 
-    movups xmm1, [esi + ebx]
-    movups xmm3, [edi + ebx]
-    add ebx, 16
+    movq xmm1, [esi + edx]
+    add edx, 8
+    movq xmm5, [esi + edx]
+    add edx, 8
+    pshufd xmm1, xmm1, 01001111b
+    addd xmm1, xmm5
 
     cvtdq2ps xmm0, xmm0
     cvtdq2ps xmm1, xmm1;
+%endmacro
+
+%macro dividir 0
+
+    movups xmm2, [edi + ebx]
+    add ebx, 16
+
+    movups xmm3, [edi + ebx]
+    add ebx, 16
 
     divps xmm2, xmm0
     divps xmm3, xmm1
@@ -59,27 +74,34 @@ cuantizar:
     xor edx, edx
     xor ebx, ebx
 
+    cargar
+    dividir
+    guardar
+
+    cargar
+    dividir
+    guardar
+
+    cargar
+    dividir
+    guardar
+
+    cargar
     dividir
     guardar
 
     dividir
     guardar
 
+    cargar
     dividir
     guardar
 
+    cargar
     dividir
     guardar
 
-    dividir
-    guardar
-
-    dividir
-    guardar
-
-    dividir
-    guardar
-
+    cargar
     dividir
     guardar
 
