@@ -5,6 +5,6 @@
 \contentsline {subsection}{\numberline {2.1}Calculando la cantidad de apariciones de cada s\IeC {\'\i }mbolo}{4}
 \contentsline {subsection}{\numberline {2.2}Representaci\'on del arbol de Huffman}{4}
 \contentsline {subsection}{\numberline {2.3}Codificar}{6}
-\contentsline {subsection}{\numberline {2.4}Decodificar}{8}
-\contentsline {section}{\numberline {3}Resultados}{9}
-\contentsline {section}{\numberline {4}Conclusiones}{9}
+\contentsline {subsection}{\numberline {2.4}Decodificar}{9}
+\contentsline {section}{\numberline {3}Resultados}{10}
+\contentsline {section}{\numberline {4}Conclusiones}{11}
