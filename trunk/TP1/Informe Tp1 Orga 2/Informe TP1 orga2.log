@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592-1.40.4 (MiKTeX 2.7) (preloaded format=pdflatex 2008.4.6)  13 OCT 2008 22:12
+This is pdfTeX, Version 3.141592-1.40.4 (MiKTeX 2.7) (preloaded format=pdflatex 2008.4.6)  27 NOV 2008 14:58
 entering extended mode
-**F:/Documents*and*Settings/Aaron*Wang/Escritorio/Informe*Tp1*Orga*2/Informe*TP
-1*orga2.tex
+**F:/Documents*and*Settings/Aaron*Wang/Escritorio/tporga2/TP1/Informe*Tp1*Orga*
+2/Informe*TP1*orga2.tex
 
-("F:/Documents and Settings/Aaron Wang/Escritorio/Informe Tp1 Orga 2/Informe TP
-1 orga2.tex"
+("F:/Documents and Settings/Aaron Wang/Escritorio/tporga2/TP1/Informe Tp1 Orga 
+2/Informe TP1 orga2.tex"
 LaTeX2e <2005/12/01>
 Babel <v3.8h> and hyphenation patterns for english, dumylang, nohyphenation, ge
 rman, ngerman, french, loaded.
@@ -250,39 +250,40 @@ File: Figura2.jpg Graphic file (type jpg)
  <use Figura2.jpg>
 <Figura3.jpg, id=21, 418.56375pt x 336.50719pt>
 File: Figura3.jpg Graphic file (type jpg)
- <use Figura3.jpg> [5 <Figura2.jpg>] [6 <Figura3.jpg>] <Figura4.jpg, id=31, 432
-.86719pt x 322.95656pt>
+ <use Figura3.jpg> [5 <Figura2.jpg>] [6 <Figura3.jpg>] <Figura4.jpg, id=31, 406
+.51875pt x 322.95656pt>
 File: Figura4.jpg Graphic file (type jpg)
 
 <use Figura4.jpg> <Figura5.jpg, id=32, 435.12563pt x 272.51813pt>
 File: Figura5.jpg Graphic file (type jpg)
 
-<use Figura5.jpg> [7 <Figura4.jpg> <Figura5.jpg>]
+<use Figura5.jpg> [7 <Figura4.jpg>]
 <Figura6.jpg, id=37, 446.41782pt x 287.57437pt>
 File: Figura6.jpg Graphic file (type jpg)
- <use Figura6.jpg> [8 <Figura6.jpg>] <Figura7.jpg, id=41, 390.70969pt x 286.821
-56pt>
+ <use Figura6.jpg> [8 <Figura5.jpg> <Figura6.jpg>] <Figura7.jpg, id=41, 390.709
+69pt x 286.82156pt>
 File: Figura7.jpg Graphic file (type jpg)
- <use Figura7.jpg> [9 <Figura7.jpg>] [10] ("Informe TP1 orga2.aux") ) 
+
+<use Figura7.jpg> [9 <Figura7.jpg>] [10] [11] ("Informe TP1 orga2.aux") ) 
 Here is how much of TeX's memory you used:
  3761 strings out of 95340
- 44764 string characters out of 1183931
- 138208 words of memory out of 1500000
+ 44800 string characters out of 1183931
+ 140208 words of memory out of 1500000
  6918 multiletter control sequences out of 110000
  7075 words of font info for 29 fonts, out of 1200000 for 2000
  14 hyphenation exceptions out of 8191
- 25i,7n,25p,1529b,208s stack positions out of 5000i,500n,10000p,200000b,5000s
-<F:/Archiv
-os de programa/MiKTeX 2.7/fonts/type1/bluesky/cm/cmbx10.pfb><F:/Archivos de pro
-grama/MiKTeX 2.7/fonts/type1/bluesky/cm/cmbx12.pfb><F:/Archivos de programa/MiK
-TeX 2.7/fonts/type1/bluesky/cm/cmmi10.pfb><F:/Archivos de programa/MiKTeX 2.7/f
-onts/type1/bluesky/cm/cmmi7.pfb><F:/Archivos de programa/MiKTeX 2.7/fonts/type1
-/bluesky/cm/cmr10.pfb><F:/Archivos de programa/MiKTeX 2.7/fonts/type1/bluesky/c
-m/cmr12.pfb><F:/Archivos de programa/MiKTeX 2.7/fonts/type1/bluesky/cm/cmr7.pfb
-><F:/Archivos de programa/MiKTeX 2.7/fonts/type1/bluesky/cm/cmtt10.pfb>
-Output written on "Informe TP1 orga2.pdf" (10 pages, 310266 bytes).
+ 25i,7n,25p,1541b,208s stack positions out of 5000i,500n,10000p,200000b,5000s
+<F:/Ar
+chivos de programa/MiKTeX 2.7/fonts/type1/bluesky/cm/cmbx10.pfb><F:/Archivos de
+ programa/MiKTeX 2.7/fonts/type1/bluesky/cm/cmbx12.pfb><F:/Archivos de programa
+/MiKTeX 2.7/fonts/type1/bluesky/cm/cmmi10.pfb><F:/Archivos de programa/MiKTeX 2
+.7/fonts/type1/bluesky/cm/cmmi7.pfb><F:/Archivos de programa/MiKTeX 2.7/fonts/t
+ype1/bluesky/cm/cmr10.pfb><F:/Archivos de programa/MiKTeX 2.7/fonts/type1/blues
+ky/cm/cmr12.pfb><F:/Archivos de programa/MiKTeX 2.7/fonts/type1/bluesky/cm/cmr7
+.pfb><F:/Archivos de programa/MiKTeX 2.7/fonts/type1/bluesky/cm/cmtt10.pfb>
+Output written on "Informe TP1 orga2.pdf" (11 pages, 298117 bytes).
 PDF statistics:
- 74 PDF objects out of 1000 (max. 8388607)
+ 77 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
