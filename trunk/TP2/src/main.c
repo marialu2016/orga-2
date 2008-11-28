@@ -144,9 +144,9 @@ void bmp2joc2( char* bmpin, char* joc2out )
     bG = malloc( (ih->biWidth)*(ih->biHeight) );
     bB = malloc( (ih->biWidth)*(ih->biHeight) );
 
-    bitstreamR = malloc( (ih->biWidth)*(ih->biHeight) );
-    bitstreamG = malloc( (ih->biWidth)*(ih->biHeight) );
-    bitstreamB = malloc( (ih->biWidth)*(ih->biHeight) );
+    bitstreamR = malloc( 2*(ih->biWidth)*(ih->biHeight) );
+    bitstreamG = malloc( 2*(ih->biWidth)*(ih->biHeight) );
+    bitstreamB = malloc( 2*(ih->biWidth)*(ih->biHeight) );
 
     ptr_R = bitstreamR;
     ptr_G = bitstreamG;
@@ -163,6 +163,8 @@ void bmp2joc2( char* bmpin, char* joc2out )
 	    k = i/3;
 	    bB[k] = bufferImg[i];
     }
+
+    free(bufferImg);
 
     joh->fType[0] = 'J';
     joh->fType[1] = 'O';
@@ -187,7 +189,7 @@ void bmp2joc2( char* bmpin, char* joc2out )
             free(bloque);
             free(bloque_trans);
             free(mcuant);
-            //free(bufferJoc2);
+            free(bufferJoc2);
             /*compresion del bloque correspondiente al canal verde*/
             bloque = dividirBloques( bG, i, j, ih->biWidth );
             bloque_trans = transformar( bloque , DCT );
@@ -199,7 +201,7 @@ void bmp2joc2( char* bmpin, char* joc2out )
             free(bloque);
             free(bloque_trans);
             free(mcuant);
-            //free(bufferJoc2);
+            free(bufferJoc2);
             /*compresion del bloque correspondiente al canal azul*/
             bloque = dividirBloques( bB, i, j, ih->biWidth );
             bloque_trans = transformar( bloque , DCT );
@@ -211,12 +213,21 @@ void bmp2joc2( char* bmpin, char* joc2out )
             free(bloque);
             free(bloque_trans);
             free(mcuant);
-            //free(bufferJoc2);
+            free(bufferJoc2);
         }
     }
 
     joh->bSize = tamBufferR + tamBufferG + tamBufferB;
     writejoc2(joc2out, h,  ih, joh, bitstreamR, bitstreamG,bitstreamB, tamBufferR, tamBufferG, tamBufferB);
+
+    free(DCT);
+    free(Q);
+    free(bR);
+    free(bG);
+    free(bB);
+    free(bitstreamR);
+    free(bitstreamG);
+    free(bitstreamB);
 
 }
 
@@ -479,14 +490,14 @@ int* generarQ(){
 
     Q = malloc(4*64);
 
-    Q[1] = 16; Q[2] = 11; Q[3] = 10; Q[4] = 16; Q[5] = 24; Q[6] = 40; Q[7] = 51; Q[8] = 61;
-    Q[9] = 12; Q[10] = 12; Q[11] = 14; Q[12] = 29; Q[13] = 26; Q[14] = 58; Q[15] = 50; Q[16] = 55;
-    Q[17] = 14; Q[18] = 13; Q[19] = 16; Q[20] = 24; Q[21] = 40; Q[22] = 57; Q[23] = 69; Q[24] = 56;
-    Q[25] = 14; Q[26] = 17; Q[27] = 22; Q[28] = 29; Q[29] = 51; Q[30] = 87; Q[31] = 80; Q[32] = 62;
-    Q[33] = 18; Q[34] = 22; Q[35] = 37; Q[36] = 56; Q[37] = 68; Q[38] = 109; Q[39] = 103; Q[40] = 77;
-    Q[41] = 24; Q[42] = 35; Q[43] = 55; Q[44] = 64; Q[45] = 81; Q[46] = 104; Q[47] = 113; Q[48] = 92;
-    Q[49] = 49; Q[50] = 64; Q[51] = 78; Q[52] = 87; Q[53] = 103; Q[54] = 121; Q[55] = 120; Q[56] = 101;
-    Q[57] = 72; Q[58] = 92; Q[59] = 95; Q[60] = 98; Q[61] = 112; Q[62] = 100; Q[63] = 103; Q[64] = 99;
+    Q[0] = 16; Q[1] = 11; Q[2] = 10; Q[3] = 16; Q[4] = 24; Q[5] = 40; Q[6] = 51; Q[7] = 61;
+    Q[8] = 12; Q[9] = 12; Q[10] = 14; Q[11] = 29; Q[12] = 26; Q[13] = 58; Q[14] = 50; Q[15] = 55;
+    Q[16] = 14; Q[17] = 13; Q[18] = 16; Q[19] = 24; Q[20] = 40; Q[21] = 57; Q[22] = 69; Q[23] = 56;
+    Q[24] = 14; Q[25] = 17; Q[26] = 22; Q[27] = 29; Q[28] = 51; Q[29] = 87; Q[30] = 80; Q[31] = 62;
+    Q[32] = 18; Q[33] = 22; Q[34] = 37; Q[35] = 56; Q[36] = 68; Q[37] = 109; Q[38] = 103; Q[39] = 77;
+    Q[40] = 24; Q[41] = 35; Q[42] = 55; Q[43] = 64; Q[44] = 81; Q[45] = 104; Q[46] = 113; Q[47] = 92;
+    Q[48] = 49; Q[49] = 64; Q[50] = 78; Q[51] = 87; Q[52] = 103; Q[53] = 121; Q[54] = 120; Q[55] = 101;
+    Q[56] = 72; Q[57] = 92; Q[58] = 95; Q[59] = 98; Q[60] = 112; Q[61] = 100; Q[62] = 103; Q[63] = 99;
 
     return Q;
 }

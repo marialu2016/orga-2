@@ -14,14 +14,14 @@ section .text
     movq xmm4, [esi + edx]
     add edx, 8
     pshufd xmm0, xmm0, 01001111b
-    addd xmm0, xmm4
+    paddd xmm0, xmm4
 
     movq xmm1, [esi + edx]
     add edx, 8
     movq xmm5, [esi + edx]
     add edx, 8
     pshufd xmm1, xmm1, 01001111b
-    addd xmm1, xmm5
+    paddd xmm1, xmm5
 
     cvtdq2ps xmm0, xmm0
     cvtdq2ps xmm1, xmm1;
@@ -48,10 +48,10 @@ section .text
     packssdw xmm2, xmm4
     packssdw xmm3, xmm5
 
-    movq [eax + edx], xmm2
-    add edx, 8
-    movq [eax + edx], xmm3
-    add edx, 8
+    movq [eax + ecx], xmm2
+    add ecx, 8
+    movq [eax + ecx], xmm3
+    add ecx, 8
 %endmacro
 
 cuantizar:
@@ -90,6 +90,7 @@ cuantizar:
     dividir
     guardar
 
+    cargar
     dividir
     guardar
 

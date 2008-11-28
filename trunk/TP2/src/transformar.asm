@@ -92,156 +92,162 @@ transformar:
     mov edi, b
 
 
+    cargar esi
     cargarYconvertir
-    cargar esi
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
 
-    mov esi, dct
+    mov edi, b
+    cargar esi
     cargarYconvertir
-    cargar esi
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
-    mult1  
+    cargarYconvertir
+    mult1
 
-    mov esi, dct
-    cargarYconvertir
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1  
 
-    mov esi, dct
+    mov edi, b
+    cargar esi
     cargarYconvertir
-    cargar esi
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
-    mult1  
+    cargarYconvertir
+    mult1
 
-    mov esi, dct
-    cargarYconvertir
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1  
 
-    mov esi, dct
+    mov edi, b
+    cargar esi
     cargarYconvertir
-    cargar esi
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
-    mult1  
+    cargarYconvertir
+    mult1
 
-    mov esi, dct
-    cargarYconvertir
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1
-    cargar esi
-    mult1  
 
-    mov esi, dct
+    mov edi, b
+    cargar esi
     cargarYconvertir
-    cargar esi
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
-    cargar esi
+    cargarYconvertir
     mult1
+    cargarYconvertir
+    mult1
+
+
+    mov edi, b
     cargar esi
-    mult1  
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+
+
+    mov edi, b
+    cargar esi
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+
+
+    mov edi, b
+    cargar esi
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
+    cargarYconvertir
+    mult1
 
     ;hasta aca tenemos DCT.transpuesta(B) apuntada por la variable resultado
 
