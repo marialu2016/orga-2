@@ -19,10 +19,11 @@ generarDCT:
     push eax
     call malloc
     add esp, 4
+    
     mov edi, eax
     mov ebx, eax
     mov ecx, 8
-    mov edx, 8
+    mov edx, 7
     mov dword const, 180
     finit
     fld1
@@ -46,7 +47,7 @@ cicloCol:
     je cicloFila
     dec ecx
 
-    cmp edx, 8
+    cmp edx, 7
     je i_cero
 
     fld1

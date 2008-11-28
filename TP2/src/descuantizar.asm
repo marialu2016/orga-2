@@ -29,7 +29,7 @@ section .text
     movq xmm2, [edi + edx]
     add edx, 8
     punpcklwd xmm2, xmm4
-    mov xmm3, [edi + edx]
+    movq xmm3, [edi + edx]
     add edx, 8
     punpcklwd xmm3, xmm4
     cvtdq2ps xmm2, xmm2
