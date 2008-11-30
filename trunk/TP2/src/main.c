@@ -88,11 +88,11 @@ int main()
 {
     char* bmpin = "test.bmp";
     char* joc2out = "test.joc2";
-    //char* joc2in = "test.joc2";
-    //char* bmpout = "test2.bmp";
+    char* joc2in = "test.joc2";
+    char* bmpout = "testd.bmp";
 
     bmp2joc2( bmpin, joc2out );
-    //joc22bmp( joc2in, bmpout );
+    joc22bmp( joc2in, bmpout );
 
     printf("vuelva prontos!\n");
     return 0;
@@ -140,13 +140,13 @@ void bmp2joc2( char* bmpin, char* joc2out )
 
     bufferImg = readbmp( bmpin, h, ih );
 
-    bR = malloc( (ih->biWidth)*(ih->biHeight) );
-    bG = malloc( (ih->biWidth)*(ih->biHeight) );
-    bB = malloc( (ih->biWidth)*(ih->biHeight) );
+    bR = malloc( ih->biSizeImage/3 );
+    bG = malloc( ih->biSizeImage/3 );
+    bB = malloc( ih->biSizeImage/3 );
 
-    bitstreamR = malloc( 2*(ih->biWidth)*(ih->biHeight) );
-    bitstreamG = malloc( 2*(ih->biWidth)*(ih->biHeight) );
-    bitstreamB = malloc( 2*(ih->biWidth)*(ih->biHeight) );
+    bitstreamR = malloc( ih->biSizeImage/3 );
+    bitstreamG = malloc( ih->biSizeImage/3 );
+    bitstreamB = malloc( ih->biSizeImage/3 );
 
     ptr_R = bitstreamR;
     ptr_G = bitstreamG;
@@ -174,9 +174,9 @@ void bmp2joc2( char* bmpin, char* joc2out )
     DCT = generarDCT();
     Q = generarQ();
 
-    for( i = 0; i <  ih->biWidth; i+= 8 )
+    for( i = 0; i <  (ih->biSizeImage/3); i+= 8 )
     {
-        for( j = 0; j <  ih->biHeight; j+= 8 )
+        for( j = 0; j <  (ih->biSizeImage/3); j+= 8 )
         {
             /*compresion del bloque correspondiente al canal rojo*/
             bloque = dividirBloques( bR, i, j, ih->biWidth);
@@ -241,10 +241,10 @@ void joc22bmp( char* joc2in, char* bmpout ){
     struct joc2FileHeader* joh = &vjoh;
 
     char* bitstream;
-    char* bufferImg;
-    char* bR = NULL;
-    char* bG = NULL;
-    char* bB = NULL;
+    char* bufferImg = malloc( ih->biSizeImage );
+    char* bR = malloc( ih->biSizeImage/3 );
+    char* bG = malloc( ih->biSizeImage/3 ) ;
+    char* bB = malloc( ih->biSizeImage/3 );
     //char* bitstreamR = NULL;
     //char* bitstreamG = NULL;
     //char* bitstreamB = NULL;
@@ -270,36 +270,45 @@ void joc22bmp( char* joc2in, char* bmpout ){
     DCT = generarDCT();
     Q = generarQ();
 
-    for( i = 0; i < ih->biWidth; i=+8 )
+    for( i = 0; i < (ih->biSizeImage/3); i=+8 )
     {
-        for( j = 0; j < ih->biHeight; j=+8 )
+        for( j = 0; j < (ih->biSizeImage/3); j=+8 )
         {
             mcuant = decodificar( bitstream, &offset);
             bloque_trans = descuantizar( mcuant, Q );
             bloque = antiTransformar( bloque_trans, DCT );
             unirBloques( bR, bloque, i, j, ih->biWidth );
+            free(mcuant);
+            free(bloque_trans);
+            free(bloque);
         }
     }
 
-    for( i = 0; i < ih->biWidth; i=+8 )
+    for( i = 0; i < (ih->biSizeImage/3); i=+8 )
     {
-        for( j = 0; j < ih->biHeight; j=+8 )
+        for( j = 0; j < (ih->biSizeImage/3); j=+8 )
         {
             mcuant = decodificar( bitstream, &offset);
             bloque_trans = descuantizar( mcuant, Q );
             bloque = antiTransformar( bloque_trans, DCT );
             unirBloques( bG, bloque, i, j, ih->biWidth );
+            free(mcuant);
+            free(bloque_trans);
+            free(bloque);
         }
     }
 
-    for( i = 0; i < ih->biWidth; i=+8 )
+    for( i = 0; i < (ih->biSizeImage/3); i=+8 )
     {
-        for( j = 0; j < ih->biHeight; j=+8 )
+        for( j = 0; j < (ih->biSizeImage/3); j=+8 )
         {
             mcuant = decodificar( bitstream, &offset);
             bloque_trans = descuantizar( mcuant, Q );
             bloque = antiTransformar( bloque_trans, DCT );
             unirBloques( bB, bloque, i, j, ih->biWidth );
+            free(mcuant);
+            free(bloque_trans);
+            free(bloque);
         }
     }
 
@@ -316,6 +325,14 @@ void joc22bmp( char* joc2in, char* bmpout ){
     }
 
     writebmp( bmpout,h,ih,bufferImg);
+
+    free(bR);
+    free(bG);
+    free(bB);
+    free(bufferImg);
+    free(bitstream);
+    free(DCT);
+    free(Q);
 
 }
 
@@ -399,8 +416,8 @@ void writebmp( char* bmpout, header* h, infoHeader* ih, char* bufferImg ){
         fwrite( &(ih->bfSize), 4, 1, fp );
         fwrite( &(ih->biWidth), 4, 1, fp );
         fwrite( &(ih->biHeight), 4, 1, fp );
-        fwrite( &(ih->biPlanes), 4, 1, fp );
-        fwrite( &(ih->biBitCount), 4, 1, fp );
+        fwrite( &(ih->biPlanes), 2, 1, fp );
+        fwrite( &(ih->biBitCount), 2, 1, fp );
         fwrite( &(ih->biCompression), 4, 1, fp );
         fwrite( &(ih->biSizeImage), 4, 1, fp );
         fwrite( &(ih->biXPelsPerM), 4, 1, fp );
@@ -536,8 +553,8 @@ void writejoc2( char* joc2out, header* h, infoHeader* ih, joc2FileHeader* joh, c
             fwrite( &(ih->bfSize), 4, 1, fp );
             fwrite( &(ih->biWidth), 4, 1, fp );
             fwrite( &(ih->biHeight), 4, 1, fp );
-            fwrite( &(ih->biPlanes), 4, 1, fp );
-            fwrite( &(ih->biBitCount), 4, 1, fp );
+            fwrite( &(ih->biPlanes), 2, 1, fp );
+            fwrite( &(ih->biBitCount), 2, 1, fp );
             fwrite( &(ih->biCompression), 4, 1, fp );
             fwrite( &(ih->biSizeImage), 4, 1, fp );
             fwrite( &(ih->biXPelsPerM), 4, 1, fp );

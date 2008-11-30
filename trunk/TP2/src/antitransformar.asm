@@ -39,6 +39,24 @@ section .text
     lea eax, [eax + 4]
 %endmacro
 
+%macro mult2 0
+    mulps xmm3, xmm1
+    mulps xmm4, xmm2
+    addps xmm3, xmm4
+    shufps xmm4, xmm3, 10110000b
+    addps xmm3, xmm4
+    shufps xmm4, xmm3, 01000000b
+    addps xmm3, xmm4
+
+    cvtps2dq xmm3, xmm3
+    packssdw xmm3, xmm3
+    packsswb xmm3, xmm3
+    
+    movd ecx, xmm3
+    mov [eax], cl 
+    lea eax, [eax + 1]
+%endmacro
+
 antiTransformar:
     push ebp
     mov ebp, esp
@@ -53,8 +71,8 @@ antiTransformar:
     add esp, 4
     mov pre_res, eax
 
-    mov esi, b
-    mov edi, dct
+    mov esi, dct
+    mov edi, b
     
     xor edx, edx
     xor ecx, ecx
@@ -270,10 +288,10 @@ antiTransformar:
 
     mov esi, pre_res 
     mov edi, dct
-    push edi
-    call transpuesta
-    add esp, 4
-    mov edi, eax
+    ;push edi
+    ;call transpuesta
+    ;add esp, 8
+    ;mov edi, eax
     
     mov eax, 64
     push eax
@@ -288,223 +306,223 @@ antiTransformar:
 
     cargar
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     xor ebx, ebx
     cargar
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     xor ebx, ebx
     cargar
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     xor ebx, ebx
     cargar
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     xor ebx, ebx
     cargar
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     xor ebx, ebx
     cargar
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     xor ebx, ebx
     cargar
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     xor ebx, ebx
     cargar
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
     cargar2
-    mult
+    mult2
 
 
-    mov eax, resultado
-    push eax 
-    call transpuesta 
-    add esp, 4
-    mov edi, eax
+    ;mov eax, resultado
+    ;push eax 
+    ;call transpuesta 
+    ;add esp, 4
+    ;mov edi, eax
 
     mov eax, pre_res
     push eax
     call free
     add esp, 4
-    mov eax, edi
+    mov eax, resultado
     
 fin:
     pop ebx

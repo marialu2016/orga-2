@@ -14,7 +14,7 @@ section .text
 decodificar:
     push ebp
     mov ebp, esp
-    sub esp, 4
+    sub esp, 12
     push edi
     push esi
     push ebx
@@ -23,8 +23,9 @@ decodificar:
     
     mov eax, 64
     shl eax, 1
+    push eax
     call malloc
-    add esp, 12
+    add esp, 4
     mov edi, eax
     mov res, eax
 
@@ -37,11 +38,11 @@ decodificar:
     lea edi, [edi + 2]
     lea esi, [esi + 1]
     mov bl, [esi]
-    mov ceros, ebx
+    mov ceros, bl
     lea esi, [esi + 1]
 
 ciclo:
-    cmp ebx, 14
+    cmp ebx, 13
     ja termine
     cmp ebx, 7
     ja post_ciclo
@@ -59,20 +60,21 @@ preDiagAb:
 post_ciclo:
     shr ebx,1
     jc preDiagAb2
+    shl ebx, 1
     mov edx, ebx
     sub edx, 7
-    mov ecx, ebx
-    sub ecx, edx
+    mov ecx, 7
     jmp diagArriba
 preDiagAb2:
+    shl ebx,1
+    add ebx,1
     mov ecx, ebx
     sub ecx, 7
-    mov edx, ebx
-    sub edx, ecx
+    mov edx, 7
 
 diagAbajo:
     mov eax, edx
-    shl edx, 1
+    shl eax, 1
     shl ecx, 4
     add eax, ecx
     shr ecx, 4
@@ -80,12 +82,12 @@ diagAbajo:
 termine:
     jmp fin
 seguir:
-    inc ecx
-    dec edx
-    add ecx, edx
-    cmp ebx, ecx
-    ja ciclar
-    sub ecx, edx
+    inc ecx ; me posiciono en la siguiente fila 
+    dec edx ; me posiciono en la anterior columna
+    ;add ecx, edx ; fila + columna 
+    cmp ebx, ecx ; fila + columna <= diagActual
+    jb ciclar
+    ;sub ecx, edx
     cmp ecx, 7
     ja ciclar
     mov eax, ecx
@@ -97,8 +99,10 @@ seguir:
 ciclar:
     xor ecx, ecx
     xor edx, edx
-    inc ebx
+    inc ebx ; incremento la columna actual
     jmp ciclo
+    
+    
 agregar:
     cmp byte ceros, 0
     jne ag_cero
@@ -108,7 +112,7 @@ agregar:
     mov [edi + eax], bx
     lea esi, [esi + 1]
     mov bl, [esi]
-    mov ceros, ebx
+    mov ceros, bl
     lea esi, [esi + 1]
     jmp seguir
 ag_cero:
@@ -125,12 +129,12 @@ diagArriba:
 seguir2:
     inc edx
     dec ecx
-    add ecx, edx
-    cmp ebx, ecx
-    ja ciclar2
-    sub ecx, edx
+    ;add ecx, edx
+    cmp ebx, edx
+    jb ciclar2
+    ;sub ecx, edx
     cmp edx, 7
-    ja ciclar
+    ja ciclar2
     mov eax, ecx
     shl eax, 4
     shl edx, 1
@@ -142,6 +146,8 @@ ciclar2:
     xor edx, edx
     inc ebx
     jmp ciclo
+    
+    
 agregar2:
     cmp byte ceros, 0
     jne ag_cero2
@@ -151,7 +157,7 @@ agregar2:
     mov [edi + eax], bx
     lea esi, [esi + 1]
     mov bl, [esi]
-    mov ceros, ebx
+    mov ceros, bl
     lea esi, [esi + 1]
     jmp seguir2
 ag_cero2:
