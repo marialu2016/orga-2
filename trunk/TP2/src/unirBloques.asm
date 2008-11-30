@@ -25,6 +25,8 @@ unirBloques:
 	mov edi, buffer
 	mov eax, ancho
 	mov ecx, coord_i
+	mov ebx, ancho	
+	mov esi, bloque
 ubicar_i:
     cmp ecx, 0
     je seguir
@@ -39,8 +41,6 @@ seguir:
 	lea edi, [edi + eax]
 
 	;Copio bloque en i,j
-	mov ebx, ancho	
-	mov esi, bloque
 
 	mov eax, [esi]
 	mov [edi], eax
