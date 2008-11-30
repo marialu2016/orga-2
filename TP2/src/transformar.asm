@@ -48,14 +48,14 @@ section .text
 
 %macro mult1 0
 
-    mulps xmm3, xmm1
-    mulps xmm4, xmm2
-    addps xmm3, xmm4
-    pshufd xmm4, xmm3, 00001011b
-    addps xmm3, xmm4
-    pshufd xmm4, xmm3, 00000001b
-    addps xmm3, xmm4
-    movss [eax], xmm3
+    mulps xmm1, xmm3
+    mulps xmm2, xmm4
+    addps xmm1, xmm2
+    pshufd xmm2, xmm1, 00001011b
+    addps xmm1, xmm2
+    pshufd xmm2, xmm1, 00000001b
+    addps xmm1, xmm2
+    movss [eax], xmm1
     lea eax, [eax + 4]
 
 %endmacro

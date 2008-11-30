@@ -66,7 +66,6 @@ descuantizar:
     
     xor ecx, ecx
     xor ebx, ebx
-    xor eax, eax
     xor edx, edx
 
     mult
@@ -94,6 +93,7 @@ descuantizar:
     guardar
 
 fin:
+    mov eax, res
     pop ebx
     pop esi
     pop edi

@@ -49,7 +49,7 @@ codificar:
     xor ecx, ecx
 
 ciclo:
-    cmp ebx, 14
+    cmp ebx, 13
     ja termine
     cmp ebx, 7
     ja post_ciclo
@@ -87,6 +87,12 @@ diagAbajo:
     shr ecx, 4
     jmp genio
 termine:
+    mov dl, ceros
+    mov [edi], dl
+    mov dl , [esi + eax]
+    mov [edi + 1], dl
+    lea edi, [edi + 2]
+    add dword memapedir, 2
     jmp reservar
 seguir:
     inc ecx ; me posiciono en la siguiente fila 
