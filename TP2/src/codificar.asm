@@ -21,7 +21,7 @@ codificar:
     push esi
     push ebx
 
-    mov eax, 129
+    mov eax, 191
     push eax
     call malloc
     add esp, 4
@@ -35,12 +35,12 @@ codificar:
     xor edx, edx ; contador columnas y para guardar el elemento
     mov dword memapedir, 0
     
-    mov dl, [esi] ;primer elemento
-    mov [edi], dl ;copio primer elemento al bitstream
+    mov dx, [esi] ;primer elemento
+    mov [edi], dx ;copio primer elemento al bitstream
     ;add ebx, 2 
-    lea edi, [edi + 1]
-    add dword memapedir, 1
-    add eax, 1
+    lea edi, [edi + 2]
+    add dword memapedir, 2
+    ;add eax, 1
     ;mov ecx, eax
     mov byte ceros, 0
 
@@ -89,10 +89,10 @@ diagAbajo:
 termine:
     mov dl, ceros
     mov [edi], dl
-    mov dl , [esi + eax]
-    mov [edi + 1], dl
-    lea edi, [edi + 2]
-    add dword memapedir, 2
+    mov dx , [esi + eax]
+    mov [edi + 1], dx
+    lea edi, [edi + 3]
+    add dword memapedir, 3
     jmp reservar
 seguir:
     inc ecx ; me posiciono en la siguiente fila 
@@ -121,10 +121,10 @@ genio:
     mov n_col, edx
     mov dl, ceros
     mov [edi], dl
-    mov dl , [esi + eax]
-    mov [edi + 1], dl
-    lea edi, [edi + 2]
-    add dword memapedir, 2
+    mov dx , [esi + eax]
+    mov [edi + 1], dx
+    lea edi, [edi + 3]
+    add dword memapedir, 3
     mov byte ceros, 0
     mov edx, n_col
     jmp seguir
@@ -166,10 +166,10 @@ genio2:
     mov n_col, edx
     mov dl, ceros
     mov [edi], dl
-    mov dl , [esi + eax]
-    mov [edi + 1], dl
-    lea edi, [edi + 2]
-    add dword memapedir, 2
+    mov dx , [esi + eax]
+    mov [edi + 1], dx
+    lea edi, [edi + 3]
+    add dword memapedir, 3
     mov byte ceros, 0
     mov edx, n_col
     jmp seguir2

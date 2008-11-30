@@ -10,17 +10,22 @@ section .text
 %define res [ebp - 4]
 %define vlocal [ebp - 8]
 %define ceros [ebp - 12]
+%define contador [ebp - 16]
 
 decodificar:
     push ebp
     mov ebp, esp
-    sub esp, 12
+    sub esp, 16
     push edi
     push esi
     push ebx
 
-    mov esi, offset ; o podria ser mov esi, bitstream y luego lea esi, [esi + offset]
-    
+    mov esi, bitstream
+    mov edi, offset ; o podria ser mov esi, bitstream y luego lea esi, [esi + offset]
+    mov edi, [edi]
+    lea esi, [esi + edi]
+    mov dword contador, 0
+        
     mov eax, 64
     shl eax, 1
     push eax
@@ -33,10 +38,11 @@ decodificar:
     xor eax, eax   
     xor edx, edx 
 
-    mov bl, [esi]
+    mov bx, [esi]
     mov [edi], bx
-    lea edi, [edi + 2]
-    lea esi, [esi + 1]
+    lea esi, [esi + 2]
+    add dword contador, 2
+    xor ebx, ebx
     mov bl, [esi]
     mov ceros, bl
     lea esi, [esi + 1]
@@ -108,15 +114,19 @@ agregar:
     jne ag_cero
     mov vlocal, ebx
     xor ebx, ebx
-    mov bl, [esi]
+    mov bx, [esi]
     mov [edi + eax], bx
-    lea esi, [esi + 1]
+    lea esi, [esi + 2]
+    add dword contador, 2
+    xor ebx, ebx
     mov bl, [esi]
     mov ceros, bl
     lea esi, [esi + 1]
+    mov ebx, vlocal
     jmp seguir
 ag_cero:
-    mov dword [edi + eax], 0
+    mov word [edi + eax], 0
+    add dword contador, 1
     jmp seguir
 
 diagArriba:
@@ -153,24 +163,31 @@ agregar2:
     jne ag_cero2
     mov vlocal, ebx
     xor ebx, ebx
-    mov bl, [esi]
+    mov bx, [esi]
     mov [edi + eax], bx
-    lea esi, [esi + 1]
+    lea esi, [esi + 2]
+    add dword contador, 2
+    xor ebx, ebx
     mov bl, [esi]
     mov ceros, bl
     lea esi, [esi + 1]
+    mov ebx, vlocal
     jmp seguir2
 ag_cero2:
     mov dword [edi + eax], 0
+    add dword contador, 1
     jmp seguir2
     
      
 
 fin:
+    mov edi, offset
+    mov ebx, contador
+    mov [edi], ebx
     mov eax, res
     pop ebx
     pop esi
     pop edi
-    add esp, 12
+    add esp, 16
     pop ebp
     ret
