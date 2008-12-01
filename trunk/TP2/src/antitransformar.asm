@@ -50,8 +50,9 @@ section .text
 
     cvtps2dq xmm3, xmm3
     packssdw xmm3, xmm3
-    packsswb xmm3, xmm3
+    packuswb xmm3, xmm3
     
+    xor ecx, ecx
     movd ecx, xmm3
     mov [eax], cl 
     lea eax, [eax + 1]

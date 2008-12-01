@@ -16,25 +16,27 @@ section .text
     pshufd xmm0, xmm0, 01001111b 
     addps xmm0, xmm2
     cvtdq2ps xmm0, xmm0
-
+    
     movq xmm1, [esi + ebx]
     add ebx, 8
-    movq xmm3, [esi + ebx]
+    movq xmm4, [esi + ebx]
     add ebx, 8
-    pshufd xmm1, xmm1, 01001111b
-    addps xmm1, xmm3
+    pshufd xmm1, xmm1, 01001111b 
+    addps xmm1, xmm4
     cvtdq2ps xmm1, xmm1
 
+    
     pxor xmm4, xmm4
     movq xmm2, [edi + edx]
     add edx, 8
     punpcklwd xmm2, xmm4
+    cvtdq2ps xmm2, xmm2
+
     movq xmm3, [edi + edx]
     add edx, 8
     punpcklwd xmm3, xmm4
-    cvtdq2ps xmm2, xmm2
     cvtdq2ps xmm3, xmm3
-
+    
     mulps xmm0, xmm2
     mulps xmm1, xmm3
 %endmacro
@@ -67,7 +69,7 @@ descuantizar:
     xor ecx, ecx
     xor ebx, ebx
     xor edx, edx
-
+    
     mult
     guardar
 
