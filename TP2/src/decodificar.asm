@@ -35,7 +35,8 @@ decodificar:
     mov res, eax
 
     xor ebx, ebx
-    xor eax, eax   
+    xor eax, eax  
+    xor ecx, ecx 
     xor edx, edx 
 
     mov bx, [esi]
@@ -46,9 +47,11 @@ decodificar:
     mov bl, [esi]
     mov ceros, bl
     lea esi, [esi + 1]
+    mov ebx, 1
+    ;lea edi, [edi + 2]
 
 ciclo:
-    cmp ebx, 13
+    cmp ebx, 14
     ja termine
     cmp ebx, 7
     ja post_ciclo
@@ -126,6 +129,7 @@ agregar:
     jmp seguir
 ag_cero:
     mov word [edi + eax], 0
+    dec byte ceros
     add dword contador, 1
     jmp seguir
 
@@ -175,6 +179,7 @@ agregar2:
     jmp seguir2
 ag_cero2:
     mov dword [edi + eax], 0
+    dec byte ceros
     add dword contador, 1
     jmp seguir2
     

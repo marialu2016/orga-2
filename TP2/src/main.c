@@ -173,7 +173,7 @@ void bmp2joc2( char* bmpin, char* joc2out )
 
     DCT = generarDCT();
     Q = generarQ();
-//int p;
+int p;
     for( i = 0; i <  (ih->biWidth); i+= 8 )
     {
         for( j = 0; j <  (ih->biHeight); j+= 8 )
@@ -290,7 +290,7 @@ void joc22bmp( char* joc2in, char* bmpout ){
 
     DCT = generarDCT();
     Q = generarQ();
-printf("hola\n");
+int p;
     for( i = 0; i < (ih->biWidth); i+=8 )
     {
         for( j = 0; j < (ih->biHeight); j+=8 )
@@ -298,6 +298,10 @@ printf("hola\n");
             mcuant = decodificar( bitstream, &offset);
             bloque_trans = descuantizar( mcuant, Q );
             bloque = antiTransformar( bloque_trans, DCT );
+            /*for(p = 0; p < 64; p++)
+            {
+                printf("la posicion %d tiene al %d \n", p, bloque[p] );
+            }*/
             unirBloques( bR, bloque, i, j, ih->biWidth );
             free(mcuant);
             free(bloque_trans);
