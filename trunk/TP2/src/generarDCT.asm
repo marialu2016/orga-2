@@ -64,10 +64,10 @@ cicloCol:
     fadd st0, st0
     fadd st0, st0; st0 = 16
     fdivp st1, st0;st0 = ((2*j+1)*i*pi)/16
-    fldpi
-    fmulp st1, st0
-    fild dword const
-    fdivp st1, st0
+    ;fldpi
+    ;fmulp st1, st0
+    ;fild dword const
+    ;fdivp st1, st0
     fcos; st0 = cos(((2*j+1)*i*pi)/16)
     fmul st0, st4; st0 = 1/2 * cos(((2*j+1)*i*pi)/16)
     jmp guardar
