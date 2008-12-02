@@ -163,6 +163,8 @@ Finalmente, el tratamiento de los bits que no son leidos, está dado como parámet
 
 \section{Resultados}
 
+ACLARACIÓN: para ver las imágenes y sus correspondientes archivos comprimidos, vea en la carpeta /tporga2/TP1/resultados del disco entregado
+
 A continuación presentaremos los pasos tomados para realizar la compresión de datos y su respectiva descompresión. 
 
 En estos pasos, empezamos tomando imágenes que solamente tuvieran los tres colores primarios usados en el RGB (es decir, el rojo, verde y el azul).  El tamaño de dicha imagen era de 3 x 2 pixeles y esto nos sirvio para determinar si efectivamente había una compresión y una descompresión en el cual se tomarán correctamente los bytes efectivos, y que se ignorara aquellos que componen los bytes. El resultado de la compresión en base a Huffman no fue alentador, debido a que obtuvimos que el dato comprimido pesaba más que el dato original. Sin embargo, si tenemos en cuenta que el tamaño del header del formato oc2 es significativamente mayor que el de bmp, sumandole el hecho de que el margen de compresión estaba sumamente acotado por el tamaño original de la imagen, verdaderamente era de esperarse este tipo de resultados.
