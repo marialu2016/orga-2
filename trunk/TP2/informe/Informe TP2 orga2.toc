@@ -1,0 +1,12 @@
+\select@language {spanish}
+\contentsline {section}{\numberline {1}Introducci\'on}{2}
+\contentsline {section}{\numberline {2}Desarrollo}{3}
+\contentsline {subsection}{\numberline {2.1}Algoritmo de divisi\'on de bloques}{3}
+\contentsline {subsection}{\numberline {2.2}algoritmo de traspuesta}{3}
+\contentsline {subsection}{\numberline {2.3}matriz DCT}{3}
+\contentsline {subsection}{\numberline {2.4}algoritmo de transformaci\'on}{4}
+\contentsline {subsection}{\numberline {2.5}Cuantizaci\'on del bloque transformado}{5}
+\contentsline {subsection}{\numberline {2.6}Codificaci\'on}{5}
+\contentsline {subsection}{\numberline {2.7}Proceso de decodificaci\'on}{7}
+\contentsline {section}{\numberline {3}Resultados}{8}
+\contentsline {section}{\numberline {4}Conclusiones}{8}
