@@ -11,20 +11,20 @@ section .text
 %macro cargar 0
     movq xmm0, [esi + edx]
     add edx, 8
+    cvtdq2ps xmm0, xmm0
     movq xmm4, [esi + edx]
     add edx, 8
-    pshufd xmm0, xmm0, 01001111b
-    paddd xmm0, xmm4
-
+    cvtdq2ps xmm4, xmm4
+    movlhps xmm0, xmm4
+    
     movq xmm1, [esi + edx]
     add edx, 8
+    cvtdq2ps xmm1, xmm1
     movq xmm5, [esi + edx]
     add edx, 8
-    pshufd xmm1, xmm1, 01001111b
-    paddd xmm1, xmm5
-
-    cvtdq2ps xmm0, xmm0
-    cvtdq2ps xmm1, xmm1;
+    cvtdq2ps xmm5, xmm5
+    movlhps xmm1, xmm5
+    
 %endmacro
 
 %macro dividir 0
@@ -41,8 +41,8 @@ section .text
 
 %macro guardar 0
 
-    cvtps2dq xmm2, xmm2
-    cvtps2dq xmm3, xmm3
+    cvttps2dq xmm2, xmm2
+    cvttps2dq xmm3, xmm3
     pxor xmm4, xmm4
     pxor xmm5, xmm5
     packssdw xmm2, xmm4
