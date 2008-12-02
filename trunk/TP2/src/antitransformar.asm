@@ -13,49 +13,49 @@ section .text
 %define resultado [ebp - 8]
 
 %macro cargar 0
-    movups xmm1, [esi + edx]
-    add edx, 16
-    movups xmm2, [esi + edx]
-    add edx, 16
+movups xmm1, [esi + edx]
+add edx, 16
+movups xmm2, [esi + edx]
+add edx, 16
 %endmacro
 
 %macro cargar2 0
-    movups xmm3, [edi + ebx]
-    add ebx, 16
-    movups xmm4, [edi + ebx]
-    add ebx, 16
+movups xmm3, [edi + ebx]
+add ebx, 16
+movups xmm4, [edi + ebx]
+add ebx, 16
 %endmacro
 
 %macro mult 0
-    mulps xmm3, xmm1
-    mulps xmm4, xmm2
-    addps xmm3, xmm4
-    shufps xmm4, xmm3, 10110000b
-    addps xmm3, xmm4
-    shufps xmm4, xmm3, 01000000b
-    addps xmm3, xmm4
+mulps xmm3, xmm1
+mulps xmm4, xmm2
+addps xmm3, xmm4
+shufps xmm4, xmm3, 10110000b
+addps xmm3, xmm4
+shufps xmm4, xmm3, 01000000b
+addps xmm3, xmm4
 
-    movss [eax], xmm3
-    lea eax, [eax + 4]
+movss [eax], xmm3
+lea eax, [eax + 4]
 %endmacro
 
 %macro mult2 0
-    mulps xmm3, xmm1
-    mulps xmm4, xmm2
-    addps xmm3, xmm4
-    shufps xmm4, xmm3, 10110000b
-    addps xmm3, xmm4
-    shufps xmm4, xmm3, 01000000b
-    addps xmm3, xmm4
+mulps xmm3, xmm1
+mulps xmm4, xmm2
+addps xmm3, xmm4
+shufps xmm4, xmm3, 10110000b
+addps xmm3, xmm4
+shufps xmm4, xmm3, 01000000b
+addps xmm3, xmm4
 
-    cvttps2dq xmm3, xmm3
-    packssdw xmm3, xmm3
-    packuswb xmm3, xmm3
-    
-    xor ecx, ecx
-    movd ecx, xmm3
-    mov [eax], cl 
-    lea eax, [eax + 1]
+cvttps2dq xmm3, xmm3
+packssdw xmm3, xmm3
+packuswb xmm3, xmm3
+
+xor ecx, ecx
+movd ecx, xmm3
+mov [eax], cl
+lea eax, [eax + 1]
 %endmacro
 
 antiTransformar:
