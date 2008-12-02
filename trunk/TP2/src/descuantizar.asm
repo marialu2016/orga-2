@@ -10,21 +10,20 @@ section .text
 
 %macro mult 0
     movq xmm0, [esi + ebx]
+    cvtdq2ps xmm0, xmm0
     add ebx, 8
     movq xmm2, [esi + ebx]
+    cvtdq2ps xmm2, xmm2
     add ebx, 8
-    pshufd xmm0, xmm0, 01001111b 
-    addps xmm0, xmm2
-    cvtdq2ps xmm0, xmm0
+    movlhps xmm0, xmm2
     
     movq xmm1, [esi + ebx]
     add ebx, 8
+    cvtdq2ps xmm1, xmm1
     movq xmm4, [esi + ebx]
     add ebx, 8
-    pshufd xmm1, xmm1, 01001111b 
-    addps xmm1, xmm4
-    cvtdq2ps xmm1, xmm1
-
+    cvtdq2ps xmm4, xmm4
+    movlhps xmm1, xmm4
     
     pxor xmm4, xmm4
     movq xmm2, [edi + edx]

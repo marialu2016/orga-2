@@ -48,9 +48,9 @@ section .text
     shufps xmm4, xmm3, 01000000b
     addps xmm3, xmm4
 
-    cvtps2dq xmm3, xmm3
+    cvttps2dq xmm3, xmm3
     packssdw xmm3, xmm3
-    packsswb xmm3, xmm3
+    packuswb xmm3, xmm3
     
     xor ecx, ecx
     movd ecx, xmm3

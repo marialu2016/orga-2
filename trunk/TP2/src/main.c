@@ -190,10 +190,10 @@ int p;
                 printf("la posicion %d tiene al %f \n", p, bloque_trans[p] );
             }*/
             mcuant = cuantizar( bloque_trans, Q );
-            /*for(p = 0; p < 64; p++)
+            for(p = 0; p < 64; p++)
             {
                 printf("la posicion %d tiene al %d \n", p, mcuant[p] );
-            }*/
+            }
             bufferJoc2  = codificar( mcuant, &tam );
             /*for(p = 0; p < tam; p++)
             {
@@ -296,7 +296,15 @@ int p;
         for( j = 0; j < (ih->biHeight); j+=8 )
         {
             mcuant = decodificar( bitstream, &offset);
+            for(p = 0; p < 64; p++)
+            {
+                printf("la posicion %d tiene al %d \n", p, mcuant[p] );
+            }
             bloque_trans = descuantizar( mcuant, Q );
+            /*for(p = 0; p < 64; p++)
+            {
+                printf("la posicion %d tiene al %f \n", p, bloque_trans[p] );
+            }*/
             bloque = antiTransformar( bloque_trans, DCT );
             /*for(p = 0; p < 64; p++)
             {
@@ -315,7 +323,7 @@ int p;
         for( j = 0; j < (ih->biHeight); j+=8 )
         {
             mcuant = decodificar( bitstream, &offset);
-            bloque_trans = descuantizar( mcuant, Q );
+            //bloque_trans = descuantizar( mcuant, Q );
             bloque = antiTransformar( bloque_trans, DCT );
             unirBloques( bG, bloque, i, j, ih->biWidth );
             free(mcuant);
