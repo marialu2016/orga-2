@@ -89,6 +89,7 @@ diagAbajo:
 termine:
     mov dl, ceros
     mov [edi], dl
+    add eax, 2
     mov dx , [esi + eax]
     mov [edi + 1], dx
     lea edi, [edi + 3]
@@ -119,6 +120,7 @@ genio:
     je aumCeros
     
     mov n_col, edx
+    xor edx, edx
     mov dl, ceros
     mov [edi], dl
     mov dx , [esi + eax]
@@ -164,6 +166,7 @@ genio2:
     je aumCeros2
 
     mov n_col, edx
+    xor edx, edx
     mov dl, ceros
     mov [edi], dl
     mov dx , [esi + eax]
