@@ -284,9 +284,9 @@ void joc22bmp( char* joc2in, char* bmpout ){
     bitstream = readjoc2( joc2in, h, ih, joh );
 
     bufferImg = malloc( (ih->biSizeImage) );
-    bR = malloc( (ih->biSizeImage)/3 );
-    bG = malloc( (ih->biSizeImage)/3 );
-    bB = malloc( (ih->biSizeImage)/3 );
+    bR = malloc( (ih->biSizeImage)/3);
+    bG = malloc( (ih->biSizeImage)/3);
+    bB = malloc( (ih->biSizeImage)/3);
 
     DCT = generarDCT();
     Q = generarQ();
@@ -295,6 +295,7 @@ void joc22bmp( char* joc2in, char* bmpout ){
     {
         for( j = 0; j < (ih->biHeight); j+=8 )
         {
+  printf("i: %d, j: %d\n", i, j);
             mcuant = decodificar( bitstream, &offset);
             /*for(p = 0; p < 64; p++)
             {
@@ -311,6 +312,7 @@ void joc22bmp( char* joc2in, char* bmpout ){
                 printf("la posicion %d tiene al %d \n", p, bloque[p] );
             }*/
             unirBloques( bR, bloque, i, j, ih->biWidth );
+
             free(mcuant);
             free(bloque_trans);
             free(bloque);
@@ -323,12 +325,12 @@ void joc22bmp( char* joc2in, char* bmpout ){
         for( j = 0; j < (ih->biHeight); j+=8 )
         {
             mcuant = decodificar( bitstream, &offset);
-            //bloque_trans = descuantizar( mcuant, Q );
+            bloque_trans = descuantizar( mcuant, Q );
             bloque = antiTransformar( bloque_trans, DCT );
             unirBloques( bG, bloque, i, j, ih->biWidth );
             free(mcuant);
-            free(bloque_trans);
             free(bloque);
+            free(bloque_trans);
         }
     }
     offset = 0;
@@ -348,13 +350,13 @@ void joc22bmp( char* joc2in, char* bmpout ){
 
     for( i = 0; i < ih->biSizeImage; i++ )
     {
-	    k = i/3;
-	    bufferImg[i] = bR[k];
-	    i++;
-	    k = i/3;
-        bufferImg[i] = bG[k];
-	    i++;
-	    k = i/3;
+       k = i/3;
+       bufferImg[i] = bR[k];
+       i++;
+       k = i/3;
+       bufferImg[i] = bG[k];
+	i++;
+	k = i/3;
         bufferImg[i] = bB[k];
     }
 

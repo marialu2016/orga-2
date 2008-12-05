@@ -15,7 +15,7 @@ section .text
     movq xmm2, [esi + ebx]
     cvtdq2ps xmm2, xmm2
     add ebx, 8
-    movlhps xmm0, xmm2
+    movlhps xmm2, xmm0
     
     movq xmm1, [esi + ebx]
     add ebx, 8
@@ -23,27 +23,30 @@ section .text
     movq xmm4, [esi + ebx]
     add ebx, 8
     cvtdq2ps xmm4, xmm4
-    movlhps xmm1, xmm4
+    movlhps xmm4, xmm1
     
-    pxor xmm4, xmm4
-    movq xmm2, [edi + edx]
-    add edx, 8
-    punpcklwd xmm2, xmm4
-    cvtdq2ps xmm2, xmm2
-
+    pxor xmm5, xmm5
     movq xmm3, [edi + edx]
     add edx, 8
-    punpcklwd xmm3, xmm4
+    pcmpgtw xmm5, xmm2 
+    punpcklwd xmm3, xmm5
     cvtdq2ps xmm3, xmm3
+
+    pxor xmm5, xmm5
+    movq xmm6, [edi + edx]
+    add edx, 8
+    pcmpgtw xmm5, xmm6
+    punpcklwd xmm6, xmm5
+    cvtdq2ps xmm6, xmm6
     
-    mulps xmm0, xmm2
-    mulps xmm1, xmm3
+    mulps xmm2, xmm3
+    mulps xmm4, xmm6
 %endmacro
 
 %macro guardar 0
-    movups [eax], xmm0
+    movups [eax], xmm2
     add eax, 16
-    movups [eax], xmm1
+    movups [eax], xmm4
     add eax, 16
 %endmacro
 

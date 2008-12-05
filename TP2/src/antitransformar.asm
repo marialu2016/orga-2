@@ -30,9 +30,9 @@ add ebx, 16
 mulps xmm3, xmm1
 mulps xmm4, xmm2
 addps xmm3, xmm4
-shufps xmm4, xmm3, 10110000b
+pshufd xmm4, xmm3, 00000111b
 addps xmm3, xmm4
-shufps xmm4, xmm3, 01000000b
+pshufd xmm4, xmm3, 00000001b
 addps xmm3, xmm4
 
 movss [eax], xmm3
@@ -43,14 +43,34 @@ lea eax, [eax + 4]
 mulps xmm3, xmm1
 mulps xmm4, xmm2
 addps xmm3, xmm4
-shufps xmm4, xmm3, 10110000b
+pshufd xmm4, xmm3, 00001011b
 addps xmm3, xmm4
-shufps xmm4, xmm3, 01000000b
+pshufd xmm4, xmm3, 00000001b
 addps xmm3, xmm4
 
-cvttps2dq xmm3, xmm3
+xorps xmm4, xmm4
+cmpps xmm4, xmm3, 6
+mov ecx, -1
+movd xmm6, ecx
+pshufd xmm6, xmm6, 00000000b
+andnps xmm4, xmm6
+andps xmm3, xmm4
+
+mov ecx, 255
+movd xmm1, ecx
+cvtdq2ps xmm1, xmm1
+pshufd xmm1, xmm1, 00000000b
+movups xmm2, xmm1
+cmpps xmm1, xmm3, 1
+pand xmm2, xmm1
+andnps xmm1, xmm6
+andps xmm3, xmm1
+addps xmm3, xmm2
+
+
+cvtps2dq xmm3, xmm3
 packssdw xmm3, xmm3
-packuswb xmm3, xmm3
+packsswb xmm3, xmm3
 
 xor ecx, ecx
 movd ecx, xmm3
@@ -307,6 +327,7 @@ antiTransformar:
 
     cargar
     cargar2
+
     mult2
 
     cargar2
