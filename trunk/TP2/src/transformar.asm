@@ -17,8 +17,9 @@ section .text
     pxor xmm0, xmm0
     punpcklbw xmm1, xmm0; transforma los numeros que estan en bytes a word
     punpcklbw xmm2, xmm0; transforma los numeros que estan en bytes a word
-    punpcklwd xmm1, xmm0; transforma los numeros que estan en word a dword(parte alta)
-    punpckhwd xmm2, xmm0; transforma los numeros que estan en word a dword(parte baja)
+
+    punpcklwd xmm1, xmm0; transforma los numeros que estan en word a dword(parte baja)
+    punpckhwd xmm2, xmm0; transforma los numeros que estan en word a dword(parte alta)
     cvtdq2ps xmm1, xmm1; convierte los 4 enteros dword a float
     cvtdq2ps xmm2, xmm2; convierte los 4 enteros dword a float
     ;xmm1 tiene los primeros 4 numeros de la fila
@@ -29,9 +30,9 @@ section .text
 
 %macro cargar 1
 
-    movups xmm3, [%1];cargo la primera parte de la fila
+    movups xmm3, [%1] ;cargo la primera parte de la fila
     lea %1, [%1 + 16]
-    movups xmm4, [%1];cargo la segunda parte de la fila
+    movups xmm4, [%1] ;cargo la segunda parte de la fila
     lea %1, [%1 + 16]
 
 %endmacro
@@ -48,8 +49,8 @@ section .text
 
 %macro mult1 0
 
-    mulps xmm1, xmm3
-    mulps xmm2, xmm4
+    mulps xmm2, xmm3
+    mulps xmm1, xmm4
     addps xmm1, xmm2
     pshufd xmm2, xmm1, 00001011b
     addps xmm1, xmm2

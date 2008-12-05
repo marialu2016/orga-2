@@ -42,16 +42,16 @@ decodificar:
     mov bx, [esi]
     mov [edi], bx
     lea esi, [esi + 2]
-    add dword contador, 2
     xor ebx, ebx
     mov bl, [esi]
     mov ceros, bl
     lea esi, [esi + 1]
+    add dword contador, 3
     mov ebx, 1
     ;lea edi, [edi + 2]
 
 ciclo:
-    cmp ebx, 14
+    cmp ebx, 13
     ja termine
     cmp ebx, 7
     ja post_ciclo
@@ -89,6 +89,18 @@ diagAbajo:
     shr ecx, 4
     jmp agregar
 termine:
+    cmp byte ceros, 0
+    jne ag_c
+    mov vlocal, ebx
+    xor ebx, ebx
+    mov bx, [esi]
+    mov [edi + eax], bx
+    add dword contador, 2
+    mov ebx, vlocal
+    jmp fin
+ag_c:
+    mov word [edi + eax], 0
+    dec byte ceros
     jmp fin
 seguir:
     inc ecx ; me posiciono en la siguiente fila 
@@ -120,17 +132,16 @@ agregar:
     mov bx, [esi]
     mov [edi + eax], bx
     lea esi, [esi + 2]
-    add dword contador, 2
     xor ebx, ebx
     mov bl, [esi]
     mov ceros, bl
     lea esi, [esi + 1]
+    add dword contador, 3
     mov ebx, vlocal
     jmp seguir
 ag_cero:
     mov word [edi + eax], 0
     dec byte ceros
-    add dword contador, 1
     jmp seguir
 
 diagArriba:
@@ -170,17 +181,16 @@ agregar2:
     mov bx, [esi]
     mov [edi + eax], bx
     lea esi, [esi + 2]
-    add dword contador, 2
     xor ebx, ebx
     mov bl, [esi]
     mov ceros, bl
     lea esi, [esi + 1]
+    add dword contador, 3
     mov ebx, vlocal
     jmp seguir2
 ag_cero2:
     mov dword [edi + eax], 0
     dec byte ceros
-    add dword contador, 1
     jmp seguir2
     
      

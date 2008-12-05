@@ -15,7 +15,7 @@ section .text
     movq xmm4, [esi + edx]
     add edx, 8
     cvtdq2ps xmm4, xmm4
-    movlhps xmm0, xmm4
+    movlhps xmm4, xmm0
     
     movq xmm1, [esi + edx]
     add edx, 8
@@ -23,7 +23,7 @@ section .text
     movq xmm5, [esi + edx]
     add edx, 8
     cvtdq2ps xmm5, xmm5
-    movlhps xmm1, xmm5
+    movlhps xmm5, xmm1
     
 %endmacro
 
@@ -35,14 +35,14 @@ section .text
     movups xmm3, [edi + ebx]
     add ebx, 16
 
-    divps xmm2, xmm0
-    divps xmm3, xmm1
+    divps xmm2, xmm4
+    divps xmm3, xmm5
 %endmacro
 
 %macro guardar 0
 
-    cvttps2dq xmm2, xmm2
-    cvttps2dq xmm3, xmm3
+    cvtps2dq xmm2, xmm2
+    cvtps2dq xmm3, xmm3
     pxor xmm4, xmm4
     pxor xmm5, xmm5
     packssdw xmm2, xmm4
