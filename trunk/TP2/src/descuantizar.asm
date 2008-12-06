@@ -9,13 +9,14 @@ section .text
 %define res [ebp - 4]
 
 %macro mult 0
-    movq xmm0, [esi + ebx]
+            movq xmm0, [esi + ebx]
     cvtdq2ps xmm0, xmm0
     add ebx, 8
     movq xmm2, [esi + ebx]
     cvtdq2ps xmm2, xmm2
     add ebx, 8
     movlhps xmm2, xmm0
+    pshufd xmm2, xmm2, 01001110b
     
     movq xmm1, [esi + ebx]
     add ebx, 8
@@ -24,23 +25,24 @@ section .text
     add ebx, 8
     cvtdq2ps xmm4, xmm4
     movlhps xmm4, xmm1
+    pshufd xmm4, xmm4, 01001110b
     
     pxor xmm5, xmm5
     movq xmm3, [edi + edx]
     add edx, 8
-    pcmpgtw xmm5, xmm2 
-    punpcklwd xmm3, xmm5
-    cvtdq2ps xmm3, xmm3
+    punpcklwd xmm5, xmm3
+    psrad xmm5, 16
+    cvtdq2ps xmm5, xmm5
 
-    pxor xmm5, xmm5
+    pxor xmm3, xmm3
     movq xmm6, [edi + edx]
     add edx, 8
-    pcmpgtw xmm5, xmm6
-    punpcklwd xmm6, xmm5
-    cvtdq2ps xmm6, xmm6
+    punpcklwd xmm3, xmm6
+    psrad xmm3, 16
+    cvtdq2ps xmm3, xmm3
     
-    mulps xmm2, xmm3
-    mulps xmm4, xmm6
+    mulps xmm2, xmm5
+    mulps xmm4, xmm3
 %endmacro
 
 %macro guardar 0
@@ -72,9 +74,9 @@ descuantizar:
     xor ebx, ebx
     xor edx, edx
     
-    mult
+    mult 
     guardar
-
+    
     mult
     guardar
 

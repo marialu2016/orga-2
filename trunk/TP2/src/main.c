@@ -170,10 +170,14 @@ void bmp2joc2( char* bmpin, char* joc2out )
     joh->fType[1] = 'O';
     joh->fType[2] = 'C';
     joh->fType[3] = '2';
-
+int p=0;
     DCT = generarDCT();
+            /*for(p = 0; p < 64; p++)
+            {
+                printf("la posicion %d tiene al %f \n", p, DCT[p] );
+            }*/
     Q = generarQ();
-//int p;
+
     for( i = 0; i <  (ih->biWidth); i+= 8 )
     {
         for( j = 0; j <  (ih->biHeight); j+= 8 )
@@ -290,7 +294,7 @@ void joc22bmp( char* joc2in, char* bmpout ){
 
     DCT = generarDCT();
     Q = generarQ();
-//int p;
+int p=0;
     for( i = 0; i < (ih->biWidth); i+=8 )
     {
         for( j = 0; j < (ih->biHeight); j+=8 )
@@ -307,10 +311,10 @@ void joc22bmp( char* joc2in, char* bmpout ){
                 printf("la posicion %d tiene al %f \n", p, bloque_trans[p] );
             }*/
             bloque = antiTransformar( bloque_trans, DCT );
-            /*for(p = 0; p < 64; p++)
+            for(p = 0; p < 64; p++)
             {
                 printf("la posicion %d tiene al %d \n", p, bloque[p] );
-            }*/
+            }
             unirBloques( bR, bloque, i, j, ih->biWidth );
 
             free(mcuant);
