@@ -57,20 +57,20 @@ andnps xmm4, xmm6
 andps xmm3, xmm4
 
 mov ecx, 255
-movd xmm1, ecx
-cvtdq2ps xmm1, xmm1
-pshufd xmm1, xmm1, 00000000b
-movups xmm2, xmm1
-cmpps xmm1, xmm3, 1
-pand xmm2, xmm1
-andnps xmm1, xmm6
-andps xmm3, xmm1
+movd xmm7, ecx
+cvtdq2ps xmm7, xmm7
+pshufd xmm7, xmm7, 00000000b
+movups xmm2, xmm7
+cmpps xmm7, xmm3, 1
+pand xmm2, xmm7
+andnps xmm7, xmm6
+andps xmm3, xmm7
 addps xmm3, xmm2
 
 
 cvtps2dq xmm3, xmm3
 packssdw xmm3, xmm3
-packsswb xmm3, xmm3
+packuswb xmm3, xmm3
 
 xor ecx, ecx
 movd ecx, xmm3
@@ -327,7 +327,6 @@ antiTransformar:
 
     cargar
     cargar2
-
     mult2
 
     cargar2

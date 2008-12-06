@@ -16,6 +16,7 @@ section .text
     add edx, 8
     cvtdq2ps xmm4, xmm4
     movlhps xmm4, xmm0
+    pshufd xmm4, xmm4, 01001110b
     
     movq xmm1, [esi + edx]
     add edx, 8
@@ -24,17 +25,18 @@ section .text
     add edx, 8
     cvtdq2ps xmm5, xmm5
     movlhps xmm5, xmm1
+    pshufd xmm5, xmm5, 01001110b
     
-%endmacro
-
-%macro dividir 0
-
+    
     movups xmm2, [edi + ebx]
     add ebx, 16
 
     movups xmm3, [edi + ebx]
     add ebx, 16
+    
+%endmacro
 
+%macro dividir 0
     divps xmm2, xmm4
     divps xmm3, xmm5
 %endmacro
